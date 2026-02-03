@@ -103,6 +103,218 @@ const PrivacyPage = () => {
         </p>
       </div>
 
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "0 auto",
+          padding: "clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px)",
+        }}
+      >
+        {/* Introduction */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            marginBottom: "32px",
+            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+          }}
+        >
+          <p
+            style={{
+              color: "#4a5565",
+              lineHeight: 1.8,
+              fontSize: "16px",
+            }}
+          >
+            At SpaceHub, we are committed to protecting your privacy and
+            ensuring the security of your personal information. This Privacy
+            Policy explains how we collect, use, disclose, and safeguard your
+            information when you use our platform. By using SpaceHub, you agree
+            to the collection and use of information in accordance with this
+            policy.
+          </p>
+        </div>
+
+        {/* Sections */}
+        {sections.map((section, index) => (
+          <div
+            key={index}
+            style={{
+              background: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              marginBottom: "24px",
+              boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "22px",
+                fontWeight: 700,
+                color: "#1e3a8a",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <span style={{ color: "#2563eb" }}>{section.icon}</span>
+              {section.title}
+            </h2>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+              }}
+            >
+              {section.content.map((item, itemIndex) => (
+                <li
+                  key={itemIndex}
+                  style={{
+                    padding: "12px 0",
+                    borderBottom:
+                      itemIndex < section.content.length - 1
+                        ? "1px solid #f3f4f6"
+                        : "none",
+                    color: "#4a5565",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {formatContent(item)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        {/* Cookies Section */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            marginBottom: "24px",
+            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "22px",
+              fontWeight: 700,
+              color: "#1e3a8a",
+              marginBottom: "20px",
+            }}
+          >
+            🍪 Cookies & Tracking
+          </h2>
+          <p
+            style={{
+              color: "#4a5565",
+              lineHeight: 1.8,
+              marginBottom: "16px",
+            }}
+          >
+            We use cookies and similar tracking technologies to track activity
+            on our platform and hold certain information. Cookies are files with
+            a small amount of data that may include an anonymous unique
+            identifier.
+          </p>
+          <p style={{ color: "#4a5565", lineHeight: 1.8 }}>
+            You can instruct your browser to refuse all cookies or to indicate
+            when a cookie is being sent. However, if you do not accept cookies,
+            you may not be able to use some portions of our service.
+          </p>
+        </div>
+
+        {/* Third Parties */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            marginBottom: "24px",
+            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "22px",
+              fontWeight: 700,
+              color: "#1e3a8a",
+              marginBottom: "20px",
+            }}
+          >
+            Third-Party Services
+          </h2>
+          <p
+            style={{
+              color: "#4a5565",
+              lineHeight: 1.8,
+              marginBottom: "16px",
+            }}
+          >
+            We may employ third-party companies and individuals to facilitate
+            our service, provide the service on our behalf, perform
+            service-related functions, or assist us in analyzing how our service
+            is used. These third parties have access to your personal data only
+            to perform these tasks on our behalf and are obligated not to
+            disclose or use it for any other purpose.
+          </p>
+          <p style={{ color: "#4a5565", lineHeight: 1.8 }}>
+            Our partners include payment processors, analytics providers, and
+            cloud hosting services. We ensure all partners meet our strict
+            privacy and security standards.
+          </p>
+        </div>
+
+        {/* Contact Section */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)",
+            borderRadius: "16px",
+            padding: "40px",
+            textAlign: "center",
+            color: "white",
+          }}
+        >
+          <FiMail size={40} style={{ marginBottom: "16px" }} />
+          <h3
+            style={{
+              fontSize: "24px",
+              fontWeight: 700,
+              marginBottom: "12px",
+            }}
+          >
+            Questions About Our Privacy Policy?
+          </h3>
+          <p
+            style={{
+              opacity: 0.9,
+              marginBottom: "24px",
+              maxWidth: "500px",
+              margin: "0 auto 24px",
+            }}
+          >
+            If you have any questions or concerns about our Privacy Policy,
+            please do not hesitate to contact us.
+          </p>
+          <a
+            href="mailto:privacy@spacehub.com"
+            className="btn"
+            style={{
+              background: "white",
+              color: "#2563eb",
+              display: "inline-flex",
+            }}
+          >
+            <FiMail size={16} />
+            privacy@spacehub.com
+          </a>
+        </div>
+      </div>
+
       <Footer />
     </div>
   );
