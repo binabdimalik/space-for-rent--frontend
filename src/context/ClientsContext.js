@@ -99,7 +99,7 @@ export const ClientsProvider = ({ children }) => {
   const validateClientLogin = (email, password) => {
     // Find client with matching email AND password
     const client = clients.find(
-      (c) => c.email === email && c.password === password
+      (c) => c.email === email && c.password === password,
     );
 
     // If client found, return their data (excluding password for security)
@@ -126,3 +126,69 @@ export const ClientsProvider = ({ children }) => {
     // Use array find to locate client with matching email
     return clients.find((c) => c.email === email);
   };
+
+  /**
+   * Update a client's information
+   * @param {number} id - Client's unique ID
+   * @param {Object} updates - Object containing fields to update
+   */
+  const updateClient = (id, updates) => {
+    // Map through clients and update the one with matching ID
+    setClients((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+    );
+  };
+
+  /**
+   * Delete a client account
+   * @param {number} id - Client's unique ID to delete
+   */
+  const deleteClient = (id) => {
+    // Filter out the client with matching ID
+    setClients((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  /**
+   * Reset a client's password
+   * Used for forgot password functionality
+   * @param {string} email - Client's email address
+   * @param {string} newPassword - New password to set
+   * @returns {Object} - Success status and message
+   */
+  const resetPassword = (email, newPassword) => {
+    // First check if client with this email exists
+    const client = clients.find((c) => c.email === email);
+
+    // If no client found, return error
+    if (!client) {
+      return { success: false, message: "Email not found" };
+    }
+
+    // Update the client's password
+    setClients((prev) =>
+      prev.map((c) =>
+        c.email === email ? { ...c, password: newPassword } : c,
+      ),
+    );
+
+    // Return success message
+    return { success: true, message: "Password updated successfully" };
+  };
+
+  // Render the context provider with all client management functions
+  return (
+    <ClientsContext.Provider
+      value={{
+        clients, // Array of all clients
+        registerClient, // Function to register new clients
+        validateClientLogin, // Function to validate login credentials
+        getClientByEmail, // Function to find client by email
+        updateClient, // Function to update client info
+        deleteClient, // Function to delete a client
+        resetPassword, // Function to reset password
+      }}
+    >
+      {children}
+    </ClientsContext.Provider>
+  );
+};
