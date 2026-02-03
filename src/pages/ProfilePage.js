@@ -99,3 +99,70 @@ const ProfilePage = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* List Your Space Card */}
+                <div style={{ 
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)', 
+                    borderRadius: '12px', 
+                    padding: '24px 32px', 
+                    marginBottom: '24px',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ 
+                            width: '50px', 
+                            height: '50px', 
+                            background: 'rgba(255,255,255,0.2)', 
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <FiHome size={24} color="white" />
+                        </div>
+                        <div>
+                            <h3 style={{ color: 'white', fontWeight: 700, fontSize: '18px', marginBottom: '4px' }}>
+                                Own a Space?
+                            </h3>
+                            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}>
+                                List your property and start earning from rentals
+                            </p>
+                        </div>
+                    </div>
+                    <Link to="/list-space" className="btn" style={{ 
+                        background: 'white', 
+                        color: '#2563eb', 
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
+                        <FiPlus size={16} />
+                        List Your Space
+                    </Link>
+                </div>
+
+                {/* Tabs */}
+                <div style={{ 
+                    display: 'flex', 
+                    gap: '8px', 
+                    marginBottom: '24px',
+                    borderBottom: '1px solid #e5e7eb',
+                    paddingBottom: '16px'
+                }}>
+                    <button 
+                        className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setActiveTab('bookings')}
+                    >
+                        My Bookings
+                    </button>
+                    <button 
+                        className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        Settings
+                    </button>
+                </div>
