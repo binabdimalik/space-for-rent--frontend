@@ -3,6 +3,13 @@ import { FiShield, FiLock, FiEye, FiDatabase, FiMail } from "react-icons/fi";
 import Footer from "../components/common/Footer";
 
 const PrivacyPage = () => {
+  const formatContent = (text) => {
+    const parts = text.split("**");
+    return parts.map((part, index) =>
+      index % 2 === 1 ? <strong key={index}>{part}</strong> : part,
+    );
+  };
+
   const sections = [
     {
       icon: <FiDatabase size={24} />,
@@ -51,6 +58,51 @@ const PrivacyPage = () => {
 
   return (
     <div style={{ background: "#f5f5f4", minHeight: "calc(100vh - 70px)" }}>
+      {/* Hero Section */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)",
+          padding: "clamp(60px, 10vw, 100px) clamp(20px, 5vw, 60px)",
+          textAlign: "center",
+          color: "white",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "clamp(32px, 5vw, 48px)",
+            fontWeight: 700,
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "16px",
+          }}
+        >
+          <FiShield />
+          Privacy Policy
+        </h1>
+        <p
+          style={{
+            fontSize: "clamp(16px, 2vw, 20px)",
+            opacity: 0.9,
+            maxWidth: "600px",
+            margin: "0 auto",
+          }}
+        >
+          Your privacy is important to us. Learn how we collect, use, and
+          protect your information.
+        </p>
+        <p
+          style={{
+            fontSize: "14px",
+            opacity: 0.7,
+            marginTop: "16px",
+          }}
+        >
+          Last updated: February 1, 2026
+        </p>
+      </div>
+
       <Footer />
     </div>
   );
