@@ -8,6 +8,29 @@ import {
 } from "react-icons/fi";
 import Footer from "../components/common/Footer";
 
+const styles = `
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 500px;
+    }
+  }
+`;
+
 const FAQPage = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -100,180 +123,187 @@ const FAQPage = () => {
   };
 
   return (
-    <div style={{ background: "#f5f5f4", minHeight: "calc(100vh - 70px)" }}>
-      {/* Hero Section */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)",
-          padding: "clamp(60px, 10vw, 100px) clamp(20px, 5vw, 60px)",
-          textAlign: "center",
-          color: "white",
-        }}
-      >
-        <h1
+    <>
+      <style>{styles}</style>
+      <div style={{ background: "#f5f5f4", minHeight: "calc(100vh - 70px)" }}>
+        {/* Hero Section */}
+        <div
           style={{
-            fontSize: "clamp(32px, 5vw, 48px)",
-            fontWeight: 700,
-            marginBottom: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "16px",
+            background: "linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)",
+            padding: "clamp(60px, 10vw, 100px) clamp(20px, 5vw, 60px)",
+            textAlign: "center",
+            color: "white",
           }}
         >
-          <FiHelpCircle />
-          Frequently Asked Questions
-        </h1>
-        <p
-          style={{
-            fontSize: "clamp(16px, 2vw, 20px)",
-            opacity: 0.9,
-            maxWidth: "600px",
-            margin: "0 auto",
-          }}
-        >
-          Find answers to common questions about SpaceHub. Can't find what
-          you're looking for? Contact us!
-        </p>
-      </div>
+          <h1
+            style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 700,
+              marginBottom: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "16px",
+            }}
+          >
+            <FiHelpCircle />
+            Frequently Asked Questions
+          </h1>
+          <p
+            style={{
+              fontSize: "clamp(16px, 2vw, 20px)",
+              opacity: 0.9,
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
+            Find answers to common questions about SpaceHub. Can't find what
+            you're looking for? Contact us!
+          </p>
+        </div>
 
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          padding: "clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px)",
-        }}
-      >
-        {faqs.map((category, categoryIndex) => (
-          <div key={categoryIndex} style={{ marginBottom: "40px" }}>
-            <h2
+        <div
+          style={{
+            maxWidth: "900px",
+            margin: "0 auto",
+            padding: "clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px)",
+          }}
+        >
+          {faqs.map((category, categoryIndex) => (
+            <div key={categoryIndex} style={{ marginBottom: "40px" }}>
+              <h2
+                style={{
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color: "#1e3a8a",
+                  marginBottom: "20px",
+                  paddingBottom: "12px",
+                  borderBottom: "2px solid #e5e7eb",
+                }}
+              >
+                {category.category}
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                {category.questions.map((item, questionIndex) => {
+                  const isOpen =
+                    openIndex === `${categoryIndex}-${questionIndex}`;
+                  return (
+                    <div
+                      key={questionIndex}
+                      style={{
+                        background: "white",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        transition: "all 0.3s",
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          toggleQuestion(categoryIndex, questionIndex)
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "20px 24px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          background: isOpen ? "#eff6ff" : "white",
+                          border: "none",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: isOpen ? "#2563eb" : "#1e3a8a",
+                            fontSize: "16px",
+                            paddingRight: "16px",
+                          }}
+                        >
+                          {item.q}
+                        </span>
+                        {isOpen ? (
+                          <FiChevronUp size={20} color="#2563eb" />
+                        ) : (
+                          <FiChevronDown size={20} color="#6a7282" />
+                        )}
+                      </button>
+                      {isOpen && (
+                        <div
+                          style={{
+                            padding: "0 24px 20px",
+                            color: "#6a7282",
+                            lineHeight: 1.7,
+                            animation: "fadeIn 0.2s ease",
+                          }}
+                        >
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          {/* Still have questions */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)",
+              borderRadius: "16px",
+              padding: "40px",
+              textAlign: "center",
+              color: "white",
+              marginTop: "48px",
+            }}
+          >
+            <FiMessageCircle size={40} style={{ marginBottom: "16px" }} />
+            <h3
               style={{
                 fontSize: "24px",
                 fontWeight: 700,
-                color: "#1e3a8a",
-                marginBottom: "20px",
-                paddingBottom: "12px",
-                borderBottom: "2px solid #e5e7eb",
+                marginBottom: "12px",
               }}
             >
-              {category.category}
-            </h2>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+              Still Have Questions?
+            </h3>
+            <p
+              style={{
+                opacity: 0.9,
+                marginBottom: "24px",
+                maxWidth: "400px",
+                margin: "0 auto 24px",
+              }}
             >
-              {category.questions.map((item, questionIndex) => {
-                const isOpen =
-                  openIndex === `${categoryIndex}-${questionIndex}`;
-                return (
-                  <div
-                    key={questionIndex}
-                    style={{
-                      background: "white",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                      transition: "all 0.3s",
-                    }}
-                  >
-                    <button
-                      onClick={() =>
-                        toggleQuestion(categoryIndex, questionIndex)
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "20px 24px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        background: isOpen ? "#eff6ff" : "white",
-                        border: "none",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: isOpen ? "#2563eb" : "#1e3a8a",
-                          fontSize: "16px",
-                          paddingRight: "16px",
-                        }}
-                      >
-                        {item.q}
-                      </span>
-                      {isOpen ? (
-                        <FiChevronUp size={20} color="#2563eb" />
-                      ) : (
-                        <FiChevronDown size={20} color="#6a7282" />
-                      )}
-                    </button>
-                    {isOpen && (
-                      <div
-                        style={{
-                          padding: "0 24px 20px",
-                          color: "#6a7282",
-                          lineHeight: 1.7,
-                          animation: "fadeIn 0.2s ease",
-                        }}
-                      >
-                        {item.a}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+              Can't find the answer you're looking for? Our support team is here
+              to help.
+            </p>
+            <Link
+              to="/contact"
+              className="btn"
+              style={{
+                background: "white",
+                color: "#2563eb",
+              }}
+            >
+              Contact Support
+            </Link>
           </div>
-        ))}
-
-        {/* Still have questions */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)",
-            borderRadius: "16px",
-            padding: "40px",
-            textAlign: "center",
-            color: "white",
-            marginTop: "48px",
-          }}
-        >
-          <FiMessageCircle size={40} style={{ marginBottom: "16px" }} />
-          <h3
-            style={{
-              fontSize: "24px",
-              fontWeight: 700,
-              marginBottom: "12px",
-            }}
-          >
-            Still Have Questions?
-          </h3>
-          <p
-            style={{
-              opacity: 0.9,
-              marginBottom: "24px",
-              maxWidth: "400px",
-              margin: "0 auto 24px",
-            }}
-          >
-            Can't find the answer you're looking for? Our support team is here
-            to help.
-          </p>
-          <Link
-            to="/contact"
-            className="btn"
-            style={{
-              background: "white",
-              color: "#2563eb",
-            }}
-          >
-            Contact Support
-          </Link>
         </div>
-      </div>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 
