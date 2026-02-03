@@ -18,12 +18,7 @@ import React, { createContext, useState, useEffect } from "react";
 // Create the SpacesContext for sharing space data across components
 export const SpacesContext = createContext();
 
-/**
- * Initial demo spaces data
- * These are sample rental spaces to populate the platform
- * Each space includes location data for map display
- * In production, this data would come from a database
- */
+// Initial demo spaces data
 const initialSpaces = [
   {
     id: 1, // Unique space identifier
