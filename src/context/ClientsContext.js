@@ -56,3 +56,73 @@ export const ClientsProvider = ({ children }) => {
     // Save clients array as JSON string to localStorage
     localStorage.setItem("sfr_clients", JSON.stringify(clients));
   }, [clients]); // Re-run when clients array changes
+
+  /**
+   * Register a new client account
+   * Validates email uniqueness before creating the account
+   * @param {Object} clientData - New client's registration data
+   * @returns {Object} - Success status and client data or error message
+   */
+  const registerClient = (clientData) => {
+    // Check if email is already registered to prevent duplicates
+    const exists = clients.some((c) => c.email === clientData.email);
+
+    // If email exists, return error
+    if (exists) {
+      return { success: false, message: "Email already registered" };
+    }
+
+    // Create new client object with all required fields
+    const newClient = {
+      id: Date.now(), // Generate unique ID using timestamp
+      name: clientData.name, // Client's full name
+      email: clientData.email, // Email address
+      password: clientData.password, // Password (should be hashed in production)
+      phone: clientData.phone || "", // Phone number (optional)
+      created_at: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
+    };
+
+    // Add new client to the clients array
+    setClients((prev) => [...prev, newClient]);
+
+    // Return success with the new client data
+    return { success: true, client: newClient };
+  };
+
+  /**
+   * Validate client login credentials
+   * Checks if email and password match an existing client
+   * @param {string} email - Client's email address
+   * @param {string} password - Client's password
+   * @returns {Object|null} - Client data if valid, null if invalid
+   */
+  const validateClientLogin = (email, password) => {
+    // Find client with matching email AND password
+    const client = clients.find(
+      (c) => c.email === email && c.password === password
+    );
+
+    // If client found, return their data (excluding password for security)
+    if (client) {
+      return {
+        id: client.id,
+        name: client.name,
+        email: client.email,
+        phone: client.phone,
+        role: "user", // Set role as 'user' (not admin)
+      };
+    }
+
+    // Return null if credentials don't match
+    return null;
+  };
+
+  /**
+   * Find a client by their email address
+   * @param {string} email - Email address to search for
+   * @returns {Object|undefined} - Client object if found
+   */
+  const getClientByEmail = (email) => {
+    // Use array find to locate client with matching email
+    return clients.find((c) => c.email === email);
+  };
