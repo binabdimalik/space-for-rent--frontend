@@ -34,3 +34,25 @@ const initialClients = [
     created_at: "2026-01-18",
   },
 ];
+
+/**
+ * ClientsProvider Component - Provides client management functionality
+ * Wraps the application to give child components access to client operations
+ * @param {Object} props - Component props
+ * @param {ReactNode} props.children - Child components
+ */
+export const ClientsProvider = ({ children }) => {
+  // Initialize clients state from localStorage or use initial demo data
+  // Uses lazy initialization to only run once on mount
+  const [clients, setClients] = useState(() => {
+    // Try to get saved clients from localStorage
+    const saved = localStorage.getItem("sfr_clients");
+    // Return saved data if exists, otherwise use initial demo clients
+    return saved ? JSON.parse(saved) : initialClients;
+  });
+
+  // Effect to persist clients to localStorage whenever the data changes
+  useEffect(() => {
+    // Save clients array as JSON string to localStorage
+    localStorage.setItem("sfr_clients", JSON.stringify(clients));
+  }, [clients]); // Re-run when clients array changes
