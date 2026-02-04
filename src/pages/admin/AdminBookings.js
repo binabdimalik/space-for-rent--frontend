@@ -36,34 +36,29 @@ const AdminBookings = () => {
     }
   }, [user, navigate]);
 
- 
+  // Transform context bookings to match expected format
+  const bookings = contextBookings.map((b) => ({
+    id: b.id,
+    space_title: b.spaceTitle,
+    user_name: b.clientName,
+    user_email: b.clientEmail,
+    user_phone: b.clientPhone,
+    start_date: b.startDate,
+    end_date: b.endDate,
+    start_time: b.startTime,
+    end_time: b.endTime,
+    total_amount: b.totalAmount,
+    status: b.status,
+    payment_status: b.paymentStatus,
+    payment_method: b.paymentMethod || "Credit Card",
+    payment_date: b.createdAt,
+  }));
 
   const handleStatusChange = async (id, newStatus) => {
     updateBookingStatus(id, newStatus);
   };
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "confirmed":
-        return "status-available";
-      case "pending":
-        return "status-pending";
-      case "completed":
-        return "status-available";
-      case "cancelled":
-        return "status-booked";
-      default:
-        return "status-pending";
-    }
-  };
 
-  const filteredBookings = bookings.filter((booking) => {
-    const matchesSearch =
-      booking.space_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.user_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !filterStatus || booking.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <div className="admin-layout">
