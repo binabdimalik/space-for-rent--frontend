@@ -55,13 +55,7 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <main className="admin-content">
-        <div className="admin-header">
-          <h1 className="admin-title">Dashboard</h1>
-          <Link to="/admin/spaces" className="btn btn-primary">
-            <FiPlus size={16} />
-            Add Space
-          </Link>
-        </div>
+        
 
         {/* Stats Cards */}
         <div className="admin-stats">
