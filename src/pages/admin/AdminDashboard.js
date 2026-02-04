@@ -50,12 +50,43 @@ const AdminDashboard = () => {
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar-title">Admin Panel</div>
-       
+        <nav>
+          <Link to="/admin" className="admin-nav-link active">
+            <FiGrid size={18} />
+            Dashboard
+          </Link>
+          <Link to="/admin/spaces" className="admin-nav-link">
+            <FiHome size={18} />
+            Spaces
+          </Link>
+          <Link to="/admin/users" className="admin-nav-link">
+            <FiUsers size={18} />
+            Users
+          </Link>
+          <Link to="/admin/bookings" className="admin-nav-link">
+            <FiCalendar size={18} />
+            Bookings
+          </Link>
+          <Link to="/admin/payments" className="admin-nav-link">
+            <FiDollarSign size={18} />
+            Payments
+          </Link>
+          <Link to="/admin/chat" className="admin-nav-link">
+            <FiMessageCircle size={18} />
+            Live Chat
+          </Link>
+        </nav>
       </aside>
 
       {/* Main Content */}
       <main className="admin-content">
-        
+        <div className="admin-header">
+          <h1 className="admin-title">Dashboard</h1>
+          <Link to="/admin/spaces" className="btn btn-primary">
+            <FiPlus size={16} />
+            Add Space
+          </Link>
+        </div>
 
         {/* Stats Cards */}
         <div className="admin-stats">
@@ -88,7 +119,9 @@ const AdminDashboard = () => {
               alignItems: "center",
             }}
           >
-            
+            <h2 style={{ fontWeight: 600, fontSize: "16px", color: "#1e3a8a" }}>
+              Recent Spaces
+            </h2>
             <Link
               to="/admin/spaces"
               style={{
@@ -132,7 +165,13 @@ const AdminDashboard = () => {
                       >
                         <FiEdit2 size={16} />
                       </Link>
-                     
+                      <button
+                        onClick={() => handleDeleteSpace(space.id)}
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: "6px", color: "#dc2626" }}
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
