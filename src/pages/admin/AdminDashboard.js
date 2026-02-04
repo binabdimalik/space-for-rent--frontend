@@ -88,9 +88,7 @@ const AdminDashboard = () => {
               alignItems: "center",
             }}
           >
-            <h2 style={{ fontWeight: 600, fontSize: "16px", color: "#1e3a8a" }}>
-              Recent Spaces
-            </h2>
+            
             <Link
               to="/admin/spaces"
               style={{
