@@ -132,13 +132,7 @@ const AdminDashboard = () => {
                       >
                         <FiEdit2 size={16} />
                       </Link>
-                      <button
-                        onClick={() => handleDeleteSpace(space.id)}
-                        className="btn btn-ghost btn-sm"
-                        style={{ padding: "6px", color: "#dc2626" }}
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
+                     
                     </div>
                   </td>
                 </tr>
