@@ -36,23 +36,7 @@ const AdminBookings = () => {
     }
   }, [user, navigate]);
 
-  // Transform context bookings to match expected format
-  const bookings = contextBookings.map((b) => ({
-    id: b.id,
-    space_title: b.spaceTitle,
-    user_name: b.clientName,
-    user_email: b.clientEmail,
-    user_phone: b.clientPhone,
-    start_date: b.startDate,
-    end_date: b.endDate,
-    start_time: b.startTime,
-    end_time: b.endTime,
-    total_amount: b.totalAmount,
-    status: b.status,
-    payment_status: b.paymentStatus,
-    payment_method: b.paymentMethod || "Credit Card",
-    payment_date: b.createdAt,
-  }));
+ 
 
   const handleStatusChange = async (id, newStatus) => {
     updateBookingStatus(id, newStatus);
@@ -81,8 +65,117 @@ const AdminBookings = () => {
     return matchesSearch && matchesStatus;
   });
 
-  
-            
+  return (
+    <div className="admin-layout">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-title">Admin Panel</div>
+        <nav>
+          <Link to="/admin" className="admin-nav-link">
+            <FiGrid size={18} />
+            Dashboard
+          </Link>
+          <Link to="/admin/spaces" className="admin-nav-link">
+            <FiHome size={18} />
+            Spaces
+          </Link>
+          <Link to="/admin/users" className="admin-nav-link">
+            <FiUsers size={18} />
+            Users
+          </Link>
+          <Link to="/admin/bookings" className="admin-nav-link active">
+            <FiCalendar size={18} />
+            Bookings
+          </Link>
+          <Link to="/admin/payments" className="admin-nav-link">
+            <FiDollarSign size={18} />
+            Payments
+          </Link>
+          <Link to="/admin/chat" className="admin-nav-link">
+            <FiMessageCircle size={18} />
+            Live Chat
+          </Link>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="admin-content">
+        <div className="admin-header">
+          <h1 className="admin-title">Manage Bookings</h1>
+        </div>
+
+        {/* Filters */}
+        <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
+          <div style={{ position: "relative", flex: 1, maxWidth: "400px" }}>
+            <FiSearch
+              style={{
+                position: "absolute",
+                left: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#6a7282",
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search bookings..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input"
+              style={{ paddingLeft: "40px" }}
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="form-input"
+            style={{ width: "180px" }}
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        {/* Bookings Table */}
+        <div className="admin-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Space</th>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Date & Time</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBookings.map((booking) => (
+                <tr key={booking.id}>
+                  <td style={{ fontWeight: 600 }}>{booking.space_title}</td>
+                  <td>{booking.user_name}</td>
+                  <td>
+                    <div style={{ fontSize: "12px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        <FiMail size={12} color="#6a7282" />
+                        <a
+                          href={`mailto:${booking.user_email}`}
+                          style={{ color: "#2563eb", textDecoration: "none" }}
+                        >
+                          {booking.user_email}
+                        </a>
+                      </div>
                       <div
                         style={{
                           display: "flex",
@@ -98,7 +191,89 @@ const AdminBookings = () => {
                           {booking.user_phone}
                         </a>
                       </div>
-                   
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ fontSize: "13px" }}>
+                      <div style={{ fontWeight: 600 }}>
+                        {booking.start_date}
+                      </div>
+                      <div style={{ color: "#6a7282" }}>
+                        {booking.start_time} - {booking.end_time}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ fontSize: "13px" }}>
+                      <div style={{ fontWeight: 700, color: "#2563eb" }}>
+                        ${booking.total_amount}
+                      </div>
+                      <span
+                        className={`status-badge ${booking.payment_status === "paid" ? "status-available" : "status-pending"}`}
+                        style={{ fontSize: "10px", padding: "2px 6px" }}
+                      >
+                        {booking.payment_status === "paid"
+                          ? "✓ Paid"
+                          : "⏳ Pending"}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(booking.status)}`}
+                    >
+                      {booking.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <select
+                        value={booking.status}
+                        onChange={(e) =>
+                          handleStatusChange(booking.id, e.target.value)
+                        }
+                        className="form-input"
+                        style={{
+                          padding: "6px 10px",
+                          fontSize: "12px",
+                          width: "auto",
+                        }}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <button
+                        onClick={() => setSelectedBooking(booking)}
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: "6px" }}
+                        title="View Details"
+                      >
+                        <FiEye size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredBookings.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-state-icon">📅</div>
+            <p>No bookings found matching your criteria.</p>
+          </div>
+        )}
+      </main>
+
       {/* Booking Details Modal */}
       {selectedBooking && (
         <div className="modal-overlay" onClick={() => setSelectedBooking(null)}>
@@ -329,6 +504,8 @@ const AdminBookings = () => {
           </div>
         </div>
       )}
-    }
+    </div>
+  );
+};
 
 export default AdminBookings;
