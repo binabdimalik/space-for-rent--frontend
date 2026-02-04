@@ -58,7 +58,28 @@ const AdminBookings = () => {
     updateBookingStatus(id, newStatus);
   };
 
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "confirmed":
+        return "status-available";
+      case "pending":
+        return "status-pending";
+      case "completed":
+        return "status-available";
+      case "cancelled":
+        return "status-booked";
+      default:
+        return "status-pending";
+    }
+  };
 
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesSearch =
+      booking.space_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.user_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !filterStatus || booking.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="admin-layout">
