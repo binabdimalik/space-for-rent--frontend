@@ -13,4 +13,11 @@ const LoginPage = () => {
   const { validateClientLogin, registerClient } = useContext(ClientsContext);
   const [isLogin, setIsLogin] = useState(true);
   const [selectedRole, setSelectedRole] = useState("client"); // 'client' or 'admin'
+  const [formData, setFormData] = useState({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+
 }
