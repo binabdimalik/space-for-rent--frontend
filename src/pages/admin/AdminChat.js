@@ -29,3 +29,19 @@ const AdminChat = () => {
             return;
         }
     }, [user, navigate]);
+
+    // Poll for new messages every 2 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refreshConversations();
+        }, 2000);
+        
+        return () => clearInterval(interval);
+    }, [refreshConversations]);
+
+    const conversations = getAllConversations();
+    const selectedConversation = selectedUserId ? (allConvs[selectedUserId] || { messages: [] }) : null;
+    // Find the client name from the conversations list
+    const selectedConvInfo = conversations.find(c => String(c.userId) === String(selectedUserId));
+    const clientName = selectedConvInfo?.userName || selectedConversation?.userName || 'Unknown User';
+    const totalUnread = getUnreadCountForAdmin();
