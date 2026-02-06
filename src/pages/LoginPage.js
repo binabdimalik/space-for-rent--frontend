@@ -86,7 +86,38 @@ const LoginPage = () => {
                   );
                   setLoading(false);
                   return;
-                }
+                }    } else {
+      if (!formData.name) {
+        setError('Please enter your full name.');
+        setLoading(false);
+        return;
+      }
+
+      const result = registerClient({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (result.success) {
+        login(
+          {
+            id: result.client.id,
+            name: result.client.name,
+            email: result.client.email,
+            role: 'user'
+          },
+          'demo-token'
+        );
+        setTimeout(() => navigate('/spaces'), 100);
+        return;
+      } else {
+        setError(result.message || 'Registration failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+    }
+
 
 
 
