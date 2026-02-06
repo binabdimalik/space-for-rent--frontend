@@ -28,7 +28,18 @@ const LoginPage = () => {
       });
       setError("");
     };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
 
 
 
-}
+
+}}
