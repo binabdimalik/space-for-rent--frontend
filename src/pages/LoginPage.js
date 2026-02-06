@@ -8,8 +8,9 @@ import { ClientsContext } from "../context/ClientsContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-    const { login } = useContext(AuthContext);
-    const { validateAdminLogin } = useContext(AdminsContext);
-    const { validateClientLogin, registerClient } = useContext(ClientsContext);
-
+  const { login } = useContext(AuthContext);
+  const { validateAdminLogin } = useContext(AdminsContext);
+  const { validateClientLogin, registerClient } = useContext(ClientsContext);
+  const [isLogin, setIsLogin] = useState(true);
+  const [selectedRole, setSelectedRole] = useState("client"); // 'client' or 'admin'
 }
