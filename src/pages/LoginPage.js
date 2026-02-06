@@ -18,6 +18,9 @@ const LoginPage = () => {
       email: "",
       password: "",
       confirmPassword: "",
-    });
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
 }
