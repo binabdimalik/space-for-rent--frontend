@@ -285,3 +285,214 @@ const AdminChat = () => {
                     </div>
                 </div>
 
+                {/* Chat Area */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                    {selectedUserId && selectedConversation ? (
+                        <>
+                            {/* Chat Header */}
+                            <div style={{
+                                padding: '16px 24px',
+                                borderBottom: '1px solid #e5e7eb',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <div style={{
+                                        width: '44px',
+                                        height: '44px',
+                                        background: 'linear-gradient(135deg, #2563eb, #3b5bdb)',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'white'
+                                    }}>
+                                        <FiUser size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 style={{
+                                            margin: 0,
+                                            fontSize: '16px',
+                                            fontWeight: 600,
+                                            color: '#1e3a8a'
+                                        }}>
+                                            {clientName}
+                                        </h3>
+                                        <span style={{
+                                            fontSize: '12px',
+                                            color: '#22c55e',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <span style={{
+                                                width: '6px',
+                                                height: '6px',
+                                                background: '#22c55e',
+                                                borderRadius: '50%'
+                                            }}></span>
+                                            Active now
+                                        </span>
+                                    </div>
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: '#6a7282',
+                                    fontSize: '13px'
+                                }}>
+                                    <FiClock size={14} />
+                                    Started {selectedConversation.startedAt ? 
+                                        new Date(selectedConversation.startedAt).toLocaleDateString() : 
+                                        'Today'}
+                                </div>
+                            </div>
+
+                            {/* Messages */}
+                            <div style={{
+                                flex: 1,
+                                overflowY: 'auto',
+                                padding: '20px 24px',
+                                background: '#f9fafb',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '12px'
+                            }}>
+                                {selectedConversation.messages?.map((msg) => (
+                                    <div
+                                        key={msg.id}
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start',
+                                            maxWidth: '70%',
+                                            alignSelf: msg.sender === 'admin' ? 'flex-end' : 'flex-start'
+                                        }}
+                                    >
+                                        <div style={{
+                                            padding: '12px 16px',
+                                            borderRadius: '16px',
+                                            borderBottomRightRadius: msg.sender === 'admin' ? '4px' : '16px',
+                                            borderBottomLeftRadius: msg.sender === 'user' ? '4px' : '16px',
+                                            background: msg.sender === 'admin' 
+                                                ? 'linear-gradient(135deg, #2563eb, #3b5bdb)' 
+                                                : 'white',
+                                            color: msg.sender === 'admin' ? 'white' : '#364153',
+                                            boxShadow: msg.sender === 'user' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                                        }}>
+                                            <p style={{
+                                                margin: 0,
+                                                fontSize: '14px',
+                                                lineHeight: 1.5
+                                            }}>
+                                                {msg.text}
+                                            </p>
+                                            <div style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'flex-end',
+                                                gap: '4px',
+                                                marginTop: '4px',
+                                                opacity: 0.7,
+                                                fontSize: '10px'
+                                            }}>
+                                                {formatTime(msg.timestamp)}
+                                                {msg.sender === 'admin' && (
+                                                    msg.read ? 
+                                                        <FiCheckCircle size={12} /> : 
+                                                        <FiCheck size={12} />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* Input */}
+                            <form onSubmit={handleSend} style={{
+                                padding: '16px 24px',
+                                borderTop: '1px solid #e5e7eb',
+                                display: 'flex',
+                                gap: '12px'
+                            }}>
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Type your reply..."
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px 20px',
+                                        border: '2px solid #e5e7eb',
+                                        borderRadius: '24px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        transition: 'border-color 0.2s'
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = '#2563eb'}
+                                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!message.trim()}
+                                    style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        borderRadius: '50%',
+                                        background: message.trim() 
+                                            ? 'linear-gradient(135deg, #2563eb, #3b5bdb)' 
+                                            : '#e5e7eb',
+                                        border: 'none',
+                                        cursor: message.trim() ? 'pointer' : 'not-allowed',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'white',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    <FiSend size={18} />
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <div style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#6a7282'
+                        }}>
+                            <FiMessageCircle size={64} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                            <h3 style={{ margin: '0 0 8px', color: '#1e3a8a' }}>
+                                Select a Conversation
+                            </h3>
+                            <p style={{ margin: 0, fontSize: '14px' }}>
+                                Choose a conversation from the list to start replying
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+            </main>
+        </div>
+    );
+};
+
+export default AdminChat;
+
