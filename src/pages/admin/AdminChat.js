@@ -45,3 +45,10 @@ const AdminChat = () => {
     const selectedConvInfo = conversations.find(c => String(c.userId) === String(selectedUserId));
     const clientName = selectedConvInfo?.userName || selectedConversation?.userName || 'Unknown User';
     const totalUnread = getUnreadCountForAdmin();
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+        if (selectedUserId) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [selectedConversation?.messages?.length, selectedUserId]);
