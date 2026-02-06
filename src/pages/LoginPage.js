@@ -55,6 +55,24 @@ const LoginPage = () => {
         setTimeout(() => navigate('/admin'), 100);
         return;
       }
+          const adminUser = validateAdminLogin
+            ? validateAdminLogin(formData.email, formData.password)
+            : null;
+
+          if (adminUser) {
+            login(adminUser, "demo-token");
+            setTimeout(() => navigate("/admin"), 100);
+            return;
+          }
+
+          if (selectedRole === "admin") {
+            setError(
+              "Invalid admin credentials. Only registered admins can access the admin panel.",
+            );
+            setLoading(false);
+            return;
+          }
+
 
 
 
