@@ -132,3 +132,29 @@ const AdminChat = () => {
                     </Link>
                 </nav>
             </aside>
+
+            {/* Main Content */}
+            <main className="admin-content">
+                <div className="admin-header">
+                    <div>
+                        <h1 className="admin-title">
+                            <FiMessageCircle style={{ marginRight: '12px' }} />
+                            Live Support Chat
+                        </h1>
+                        <p className="admin-subtitle">
+                            Manage customer conversations in real-time
+                            {totalUnread > 0 && (
+                                <span style={{
+                                    background: '#f97316',
+                                    color: 'white',
+                                    padding: '2px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
+                                    marginLeft: '12px'
+                                }}>
+                                    {totalUnread} unread
+                                </span>
+                            )}
+                        </p>
+                    </div>
+                </div>
