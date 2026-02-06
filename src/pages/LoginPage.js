@@ -5,3 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AuthContext } from "../context/AuthContext";
 import { AdminsContext } from "../context/AdminsContext";
 import { ClientsContext } from "../context/ClientsContext";
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+}
