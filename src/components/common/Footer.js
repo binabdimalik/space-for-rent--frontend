@@ -1,4 +1,4 @@
-// src/components/common/Footer.js
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { FiHome } from "react-icons/fi";
