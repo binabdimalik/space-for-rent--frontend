@@ -158,7 +158,8 @@ const AdminChat = () => {
                         </p>
                     </div>
                 </div>
-                v style={{
+
+                <div style={{
                 display: 'grid',
                 gridTemplateColumns: '320px 1fr',
                 gap: '24px',
@@ -495,4 +496,3 @@ const AdminChat = () => {
 };
 
 export default AdminChat;
-
