@@ -72,6 +72,22 @@ const LoginPage = () => {
             setLoading(false);
             return;
           }
+                const clientUser = validateClientLogin
+                  ? validateClientLogin(formData.email, formData.password)
+                  : null;
+
+                if (clientUser) {
+                  login(clientUser, "demo-token");
+                  setTimeout(() => navigate("/spaces"), 100);
+                  return;
+                } else {
+                  setError(
+                    "Invalid email or password. Please check your credentials or sign up.",
+                  );
+                  setLoading(false);
+                  return;
+                }
+
 
 
 
