@@ -148,14 +148,7 @@ const AdminUsers = () => {
             <FiGrid size={18} />
             Dashboard
           </Link>
-          <Link to="/admin/spaces" className="admin-nav-link">
-            <FiHome size={18} />
-            Spaces
-          </Link>
-          <Link to="/admin/users" className="admin-nav-link active">
-            <FiUsers size={18} />
-            Users
-          </Link>
+          
           <Link to="/admin/bookings" className="admin-nav-link">
             <FiCalendar size={18} />
             Bookings
@@ -267,15 +260,6 @@ const AdminUsers = () => {
           </div>
           <div className="admin-table">
             <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                  {isSuperAdmin && <th>Actions</th>}
-                </tr>
-              </thead>
               <tbody>
                 {filteredAdmins.length === 0 ? (
                   <tr>
@@ -490,9 +474,9 @@ const AdminUsers = () => {
                   Only admin accounts can be created from this panel
                 </small>
               </div>
-              <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
-                
-              </div>
+              <div
+                style={{ display: "flex", gap: "12px", marginTop: "24px" }}
+              ></div>
             </form>
           </div>
         </div>
