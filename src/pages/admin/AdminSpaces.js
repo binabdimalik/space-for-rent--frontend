@@ -639,7 +639,8 @@ const AdminSpaces = () => {
                 {mapPosition && (
                   <p
                     style={{
-                      
+                      fontSize: "12px",
+                      color: "#059669",
                       marginTop: "4px",
                     }}
                   >
@@ -652,8 +653,7 @@ const AdminSpaces = () => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: "16px",
+                  
                 }}
               >
                 <div className="form-group">
