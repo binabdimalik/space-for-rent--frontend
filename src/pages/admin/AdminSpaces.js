@@ -686,7 +686,8 @@ const AdminSpaces = () => {
                     }
                     className="form-input"
                     min="1"
-                    
+                    placeholder="Max people"
+                    required
                   />
                 </div>
                 <div className="form-group">
