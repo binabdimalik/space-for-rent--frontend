@@ -653,7 +653,8 @@ const AdminSpaces = () => {
               <div
                 style={{
                   display: "grid",
-                  
+                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gap: "16px",
                 }}
               >
                 <div className="form-group">
@@ -678,8 +679,7 @@ const AdminSpaces = () => {
                 <div className="form-group">
                   <label className="form-label">Capacity</label>
                   <input
-                    type="number"
-                    value={formData.capacity}
+                    
                     onChange={(e) =>
                       setFormData({ ...formData, capacity: e.target.value })
                     }
