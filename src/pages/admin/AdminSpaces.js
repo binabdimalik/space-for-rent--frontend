@@ -679,14 +679,14 @@ const AdminSpaces = () => {
                 <div className="form-group">
                   <label className="form-label">Capacity</label>
                   <input
-                    
+                    type="number"
+                    value={formData.capacity}
                     onChange={(e) =>
                       setFormData({ ...formData, capacity: e.target.value })
                     }
                     className="form-input"
                     min="1"
-                    placeholder="Max people"
-                    required
+                    
                   />
                 </div>
                 <div className="form-group">
