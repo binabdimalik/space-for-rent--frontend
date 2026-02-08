@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/components/common/Navbar.js
 import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -66,5 +65,3 @@ function Navbar() {
 }
 
 export default Navbar;
-=======
->>>>>>> 00dcceae84ca72d17a50aa7de251aa69aa7f416f
