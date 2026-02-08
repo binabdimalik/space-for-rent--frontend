@@ -112,7 +112,7 @@ const AdminDashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {spaces.slice(0, 5).map(space => (
+                            {spaces.map(space => (
                                 <tr key={space.id}>
                                     <td style={{ fontWeight: 600 }}>{space.title}</td>
                                     <td>{space.location}</td>
