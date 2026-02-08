@@ -13,3 +13,11 @@ export const getSpace = (id) => API.get(`/api/spaces/${id}`);
 export const createSpace = (data) => API.post("/api/spaces", data);
 export const updateSpace = (id, data) => API.put(`/api/spaces/${id}`, data);
 export const deleteSpace = (id) => API.delete(`/api/spaces/${id}`);
+export const register = (data) => API.post('/api/auth/register', data);
+export const login = (data) => API.post('/api/auth/login', data);
+
+export const getBookings = () => API.get('/api/bookings');
+export const getBooking = (id) => API.get(`/api/bookings/${id}`);
+export const createBooking = (data) => API.post('/api/bookings', data);
+export const updateBooking = (id, data) => API.put(`/api/bookings/${id}`, data);
+export const payBooking = (id) => API.post(`/api/bookings/${id}/pay`);
