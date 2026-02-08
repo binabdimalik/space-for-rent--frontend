@@ -220,6 +220,95 @@ export const BookingsProvider = ({ children }) => {
             .reduce((sum, b) => sum + b.totalAmount, 0);
     };
 
+    /**
+     * Check if a space is already booked for the given dates/times
+     * Prevents double booking by checking for conflicts
+     * @param {number} spaceId - Space ID to check
+     * @param {string} startDate - Requested start date (YYYY-MM-DD)
+     * @param {string} endDate - Requested end date (YYYY-MM-DD)
+     * @param {string} startTime - Requested start time (HH:MM) - optional for hourly
+     * @param {string} endTime - Requested end time (HH:MM) - optional for hourly
+     * @param {string} bookingType - 'hourly' or 'daily'
+     * @returns {Object} - { hasConflict: boolean, conflictingBooking: Object|null }
+     */
+    const checkBookingConflict = (spaceId, startDate, endDate, startTime, endTime, bookingType) => {
+        // Get all confirmed/pending bookings for this space (exclude cancelled)
+        const spaceBookings = bookings.filter(b => 
+            b.spaceId === parseInt(spaceId) && 
+            b.status !== 'cancelled'
+        );
+
+        // Check each existing booking for date/time overlap
+        for (const booking of spaceBookings) {
+            const bookingStart = new Date(booking.startDate);
+            const bookingEnd = new Date(booking.endDate);
+            const requestStart = new Date(startDate);
+            const requestEnd = new Date(endDate);
+
+            // Check if dates overlap
+            const datesOverlap = requestStart <= bookingEnd && requestEnd >= bookingStart;
+
+            if (datesOverlap) {
+                // For daily bookings, any date overlap is a conflict
+                if (bookingType === 'daily' || booking.bookingType === 'daily') {
+                    return { 
+                        hasConflict: true, 
+                        conflictingBooking: booking,
+                        message: `This space is already booked from ${booking.startDate} to ${booking.endDate}`
+                    };
+                }
+
+                // For hourly bookings on the same day, check time overlap
+                if (startDate === booking.startDate) {
+                    const reqStartTime = startTime ? parseInt(startTime.replace(':', '')) : 0;
+                    const reqEndTime = endTime ? parseInt(endTime.replace(':', '')) : 2359;
+                    const bookStartTime = booking.startTime ? parseInt(booking.startTime.replace(':', '')) : 0;
+                    const bookEndTime = booking.endTime ? parseInt(booking.endTime.replace(':', '')) : 2359;
+
+                    // Check if time ranges overlap
+                    const timesOverlap = reqStartTime < bookEndTime && reqEndTime > bookStartTime;
+
+                    if (timesOverlap) {
+                        return { 
+                            hasConflict: true, 
+                            conflictingBooking: booking,
+                            message: `This space is already booked on ${booking.startDate} from ${booking.startTime} to ${booking.endTime}`
+                        };
+                    }
+                }
+            }
+        }
+
+        // No conflict found
+        return { hasConflict: false, conflictingBooking: null, message: null };
+    };
+
+    /**
+     * Get all booked dates for a space
+     * Used to disable dates in the date picker
+     * @param {number} spaceId - Space ID to check
+     * @returns {Array} - Array of booked date strings (YYYY-MM-DD)
+     */
+    const getBookedDates = (spaceId) => {
+        const spaceBookings = bookings.filter(b => 
+            b.spaceId === parseInt(spaceId) && 
+            b.status !== 'cancelled'
+        );
+
+        const bookedDates = [];
+        spaceBookings.forEach(booking => {
+            const start = new Date(booking.startDate);
+            const end = new Date(booking.endDate);
+            
+            // Add all dates in the range
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                bookedDates.push(d.toISOString().split('T')[0]);
+            }
+        });
+
+        return [...new Set(bookedDates)]; // Remove duplicates
+    };
+
     // Render the context provider with all booking management functions
     return (
         <BookingsContext.Provider value={{
@@ -232,7 +321,9 @@ export const BookingsProvider = ({ children }) => {
             getBookingsByClient,   // Function to get bookings by client email
             getBookingsByUserId,   // Function to get bookings by client ID
             getTotalRevenue,       // Function to calculate total revenue
-            getPendingAmount       // Function to calculate pending payments
+            getPendingAmount,      // Function to calculate pending payments
+            checkBookingConflict,  // Function to check for double booking
+            getBookedDates         // Function to get booked dates for a space
         }}>
             {children}
         </BookingsContext.Provider>

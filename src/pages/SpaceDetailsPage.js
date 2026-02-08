@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiUsers, FiStar, FiWifi, FiSun, FiMusic, FiCoffee, FiCalendar, FiClock, FiMail, FiPhone, FiUser } from 'react-icons/fi';
+import { FiMapPin, FiUsers, FiStar, FiWifi, FiSun, FiMusic, FiCoffee, FiCalendar, FiClock, FiMail, FiPhone, FiUser, FiAlertCircle } from 'react-icons/fi';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { AuthContext } from '../context/AuthContext';
 import { SpacesContext } from '../context/SpacesContext';
+import { BookingsContext } from '../context/BookingsContext';
 import Footer from '../components/common/Footer';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -22,7 +23,9 @@ const SpaceDetailsPage = () => {
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const { getSpaceById } = useContext(SpacesContext);
+    const { checkBookingConflict, getBookedDates } = useContext(BookingsContext);
     const [bookingType, setBookingType] = useState('hourly');
+    const [bookingError, setBookingError] = useState('');
     const [bookingData, setBookingData] = useState({
         fullName: '',
         email: '',
@@ -56,6 +59,8 @@ const SpaceDetailsPage = () => {
     };
 
     const handleBooking = () => {
+        setBookingError(''); // Clear previous errors
+        
         if (!user) {
             navigate('/login');
             return;
@@ -63,31 +68,59 @@ const SpaceDetailsPage = () => {
         
         // Validate required fields
         if (!bookingData.fullName || !bookingData.email || !bookingData.phone) {
-            alert('Please fill in your contact information (name, email, phone)');
+            setBookingError('Please fill in your contact information (name, email, phone)');
             return;
         }
         if (!bookingData.startDate || !bookingData.endDate) {
-            alert('Please select booking dates');
+            setBookingError('Please select booking dates');
             return;
         }
         if (bookingType === 'hourly' && (!bookingData.startTime || !bookingData.endTime)) {
-            alert('Please select booking times');
+            setBookingError('Please select booking times');
+            return;
+        }
+
+        // Check for double booking conflicts
+        const conflict = checkBookingConflict(
+            space.id,
+            bookingData.startDate,
+            bookingData.endDate,
+            bookingData.startTime,
+            bookingData.endTime,
+            bookingType
+        );
+
+        if (conflict.hasConflict) {
+            setBookingError(`This space is currently unavailable for your selected dates. It has been booked from ${conflict.conflictingBooking.startDate} to ${conflict.conflictingBooking.endDate}. Please explore other available spaces or select different dates.`);
             return;
         }
 
         // Calculate total amount
         let totalAmount = 0;
+        const startDateObj = new Date(bookingData.startDate);
+        const endDateObj = new Date(bookingData.endDate);
+        const numberOfDays = Math.ceil((endDateObj - startDateObj) / (1000 * 60 * 60 * 24)) + 1;
+        
         if (bookingType === 'hourly' && bookingData.startTime && bookingData.endTime) {
-            const start = new Date(`2000-01-01T${bookingData.startTime}`);
-            const end = new Date(`2000-01-01T${bookingData.endTime}`);
-            const hours = (end - start) / (1000 * 60 * 60);
-            totalAmount = hours * (space.price_per_hour || 50);
+            const startTime = new Date(`2000-01-01T${bookingData.startTime}`);
+            const endTime = new Date(`2000-01-01T${bookingData.endTime}`);
+            let hoursPerDay = (endTime - startTime) / (1000 * 60 * 60);
+            
+            // If end time is before or equal to start time, assume full day (8 hours)
+            if (hoursPerDay <= 0) {
+                hoursPerDay = 8;
+            }
+            
+            // For multi-day hourly bookings, multiply hours by number of days
+            const totalHours = hoursPerDay * numberOfDays;
+            totalAmount = totalHours * (space.price_per_hour || 50);
         } else {
-            const start = new Date(bookingData.startDate);
-            const end = new Date(bookingData.endDate);
-            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-            totalAmount = days * (space.price_per_night || space.price_per_hour * 8 || 400);
+            // Daily booking - charge per day
+            totalAmount = numberOfDays * (space.price_per_night || space.price_per_hour * 8 || 400);
         }
+
+        // Ensure minimum charge of one hour
+        totalAmount = Math.max(totalAmount, space.price_per_hour || 50);
 
         // Navigate to payment page with booking details
         navigate('/payment', {
@@ -96,9 +129,10 @@ const SpaceDetailsPage = () => {
                     spaceId: space.id,
                     spaceTitle: space.title,
                     spaceImage: space.image_url,
+                    location: space.location,
                     ...bookingData,
                     bookingType,
-                    totalAmount: Math.max(totalAmount, space.price_per_hour || 50)
+                    totalAmount
                 }
             }
         });
@@ -129,7 +163,9 @@ const SpaceDetailsPage = () => {
                             className="space-main-image"
                             style={{ width: '100%', height: '400px', objectFit: 'cover' }}
                         />
-                        <span className="space-badge">✓ {space.status || 'Available'}</span>
+                        <span className={`space-badge ${bookingError ? 'space-badge-unavailable' : ''}`}>
+                            {bookingError ? '✗ Unavailable' : `✓ ${space.status || 'Available'}`}
+                        </span>
                     </div>
 
                     {/* Space Info */}
@@ -379,6 +415,42 @@ const SpaceDetailsPage = () => {
                             }/{bookingType === 'hourly' ? 'hour' : 'day'}
                         </span>
                     </div>
+
+                    {/* Booking Unavailable Notification */}
+                    {bookingError && (
+                        <div style={{
+                            background: '#fff7ed',
+                            border: '1px solid #fed7aa',
+                            borderRadius: '12px',
+                            padding: '16px',
+                            marginBottom: '16px'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <FiAlertCircle size={22} color="#ea580c" />
+                                <span style={{ color: '#c2410c', fontSize: '16px', fontWeight: 600 }}>
+                                    Space Unavailable
+                                </span>
+                            </div>
+                            <p style={{ color: '#9a3412', fontSize: '14px', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+                                {bookingError}
+                            </p>
+                            <button 
+                                onClick={() => navigate('/spaces')}
+                                style={{
+                                    background: '#2563eb',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '8px 16px',
+                                    borderRadius: '6px',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Browse Other Spaces
+                            </button>
+                        </div>
+                    )}
 
                     {/* Book Button */}
                     <button 
