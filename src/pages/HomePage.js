@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { FiSearch, FiCalendar, FiCheckCircle, FiMapPin } from 'react-icons/fi';
-import Footer from '../components/common/Footer';
-import { SpacesContext } from '../context/SpacesContext';
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { FiSearch, FiCalendar, FiCheckCircle, FiMapPin } from "react-icons/fi";
+import Footer from "../components/common/Footer";
+import { SpacesContext } from "../context/SpacesContext";
 
 // Placeholder images - replace with actual images or API data
-const heroImage = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800";
+const heroImage =
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800";
 
 function HomePage() {
   const { getAvailableSpaces } = useContext(SpacesContext);
-  
+
   // Get first 4 available spaces for featured section
   const spaces = getAvailableSpaces().slice(0, 4);
 
@@ -33,9 +34,9 @@ function HomePage() {
             </Link>
           </div>
         </div>
-        <img 
-          src={heroImage} 
-          alt="People working in a coworking space" 
+        <img
+          src={heroImage}
+          alt="People working in a coworking space"
           className="hero-image"
         />
       </section>
@@ -44,33 +45,43 @@ function HomePage() {
       <section className="section">
         <div className="section-header">
           <h2 className="section-title">Featured Spaces</h2>
-          <p className="section-description">Explore some of our most popular listings.</p>
+          <p className="section-description">
+            Explore some of our most popular listings.
+          </p>
         </div>
 
         <div className="cards-grid">
           {spaces.map((space) => (
             <div key={space.id} className="card">
-              <img 
-                src={space.image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400'} 
-                alt={space.title} 
+              <img
+                src={
+                  space.image_url ||
+                  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"
+                }
+                alt={space.title}
                 className="card-image"
               />
-                <div className="card-content">
-                  <h3 className="card-title">{space.title}</h3>
-                  <p className="card-location">
-                    <FiMapPin size={14} />
-                    {space.location}
-                  </p>
-                  <div className="card-price">
-                    <span className="card-price-amount">${space.price_per_hour || space.price_per_night}</span>
-                    <span className="card-price-unit">/hr</span>
-                  </div>
-                  <Link to={`/spaces/${space.id}`} className="btn btn-primary card-button">
-                    View Details
-                  </Link>
+              <div className="card-content">
+                <h3 className="card-title">{space.title}</h3>
+                <p className="card-location">
+                  <FiMapPin size={14} />
+                  {space.location}
+                </p>
+                <div className="card-price">
+                  <span className="card-price-amount">
+                    ${space.price_per_hour || space.price_per_night}
+                  </span>
+                  <span className="card-price-unit">/hr</span>
                 </div>
+                <Link
+                  to={`/spaces/${space.id}`}
+                  className="btn btn-primary card-button"
+                >
+                  View Details
+                </Link>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </section>
 
