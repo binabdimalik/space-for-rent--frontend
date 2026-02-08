@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -9,3 +10,5 @@ root.render(
     <App />
   </React.StrictMode>
 );
+=======
+>>>>>>> 00dcceae84ca72d17a50aa7de251aa69aa7f416f
