@@ -296,7 +296,7 @@ export const ChatProvider = ({ children }) => {
             ...conv,
             oderId: oderId,
             oderId,
-            oderId: oderId
+            userId: oderId
         }))
         // Sort by last message time, most recent first
         .sort((a, b) => new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0));

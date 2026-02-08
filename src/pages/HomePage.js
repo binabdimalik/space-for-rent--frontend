@@ -1,14 +1,47 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSearch, FiCalendar, FiCheckCircle, FiMapPin } from 'react-icons/fi';
 import Footer from '../components/common/Footer';
 import { SpacesContext } from '../context/SpacesContext';
 
-// Placeholder images - replace with actual images or API data
-const heroImage = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800";
+// Hero slideshow images - rotating every 3 seconds
+const heroImages = [
+  {
+    url: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
+    alt: "Modern office space with natural light"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800",
+    alt: "Professional meeting room"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800",
+    alt: "Creative coworking space"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1462826303086-329426d1aef5?w=800",
+    alt: "Executive conference room"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
+    alt: "Stylish event venue"
+  }
+];
 
 function HomePage() {
   const { getAvailableSpaces } = useContext(SpacesContext);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Auto-rotate hero images every 3 seconds with smooth crossfade
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // Get first 4 available spaces for featured section
   const spaces = getAvailableSpaces().slice(0, 4);
@@ -33,11 +66,28 @@ function HomePage() {
             </Link>
           </div>
         </div>
-        <img 
-          src={heroImage} 
-          alt="People working in a coworking space" 
-          className="hero-image"
-        />
+        <div className="hero-image-container" style={{ position: 'relative', overflow: 'hidden' }}>
+          {/* Background image for crossfade effect */}
+          {heroImages.map((image, index) => (
+            <img 
+              key={index}
+              src={image.url} 
+              alt={image.alt}
+              className="hero-image"
+              style={{
+                position: index === 0 ? 'relative' : 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: index === currentImageIndex ? 1 : 0,
+                transition: 'opacity 0.8s ease-in-out',
+                zIndex: index === currentImageIndex ? 1 : 0
+              }}
+            />
+          ))}
+        </div>
       </section>
 
       {/* Featured Spaces Section */}

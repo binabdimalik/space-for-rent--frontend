@@ -32,6 +32,15 @@ const SpacesPage = () => {
     const allVerifiedSpaces = getVerifiedSpaces();
     const spaces = allVerifiedSpaces.filter(s => s.status === 'available');
 
+    // Extract unique locations from all spaces for the filter dropdown
+    const uniqueLocations = [...new Set(spaces.map(space => {
+        // Extract city/area name from the location string
+        const location = space.location || '';
+        // Try to get the main city/area (last part after comma, or full string)
+        const parts = location.split(',').map(p => p.trim());
+        return parts[parts.length - 1] || parts[0] || location;
+    }).filter(loc => loc))].sort();
+
     const filteredSpaces = spaces.filter(space => {
         const matchesSearch = space.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             space.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -89,11 +98,11 @@ const SpacesPage = () => {
                             className="form-input"
                         >
                             <option value="">All Locations</option>
-                            <option value="NYC">NYC</option>
-                            <option value="Los Angeles">Los Angeles</option>
-                            <option value="Miami">Miami</option>
-                            <option value="Chicago">Chicago</option>
-                            <option value="San Francisco">San Francisco</option>
+                            {uniqueLocations.map(location => (
+                                <option key={location} value={location}>
+                                    {location}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>

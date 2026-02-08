@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiCreditCard, FiLock, FiCheck, FiCalendar, FiClock, FiUser, FiMail, FiPhone } from 'react-icons/fi';
+import { FiCreditCard, FiLock, FiCheck, FiCalendar, FiClock, FiUser, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import { BookingsContext } from '../context/BookingsContext';
 import Footer from '../components/common/Footer';
@@ -101,44 +101,169 @@ const PaymentPage = () => {
     };
 
     if (success) {
+        const confirmationNumber = `SFR-${Date.now().toString().slice(-8)}`;
+        
         return (
             <div className="payment-page">
                 <div className="payment-container">
-                    <div className="payment-success">
-                        <div className="success-icon">
+                    {/* Success Notification Banner */}
+                    <div style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        marginBottom: '24px',
+                        textAlign: 'center',
+                        color: 'white'
+                    }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            background: 'rgba(255,255,255,0.2)',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 16px'
+                        }}>
                             <FiCheck size={48} />
                         </div>
-                        <h2>Payment Successful!</h2>
-                        <p>Your booking has been confirmed.</p>
-                        
-                        <div className="booking-confirmation">
-                            <h3>Booking Details</h3>
-                            <div className="confirmation-details">
-                                <div className="confirmation-row">
-                                    <span>Space:</span>
-                                    <strong>{booking.spaceTitle}</strong>
-                                </div>
-                                <div className="confirmation-row">
-                                    <span>Date:</span>
-                                    <strong>{booking.startDate} - {booking.endDate}</strong>
-                                </div>
-                                {booking.bookingType === 'hourly' && (
-                                    <div className="confirmation-row">
-                                        <span>Time:</span>
-                                        <strong>{booking.startTime} - {booking.endTime}</strong>
-                                    </div>
-                                )}
-                                <div className="confirmation-row">
-                                    <span>Total Paid:</span>
-                                    <strong style={{ color: '#16a34a' }}>${booking.totalAmount.toFixed(2)}</strong>
-                                </div>
-                            </div>
-                            <p style={{ marginTop: '16px', fontSize: '14px', color: '#6a7282' }}>
-                                A confirmation email has been sent to <strong>{booking.email}</strong>
+                        <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px' }}>
+                            🎉 Successfully Booked!
+                        </h2>
+                        <p style={{ fontSize: '18px', opacity: 0.9 }}>
+                            Payment Complete - Your reservation is confirmed
+                        </p>
+                    </div>
+
+                    {/* Reservation Ticket */}
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                        border: '2px dashed #e5e7eb',
+                        position: 'relative'
+                    }}>
+                        {/* Ticket Header */}
+                        <div style={{
+                            background: 'linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%)',
+                            padding: '24px',
+                            color: 'white',
+                            textAlign: 'center'
+                        }}>
+                            <h3 style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8, marginBottom: '8px' }}>
+                                Reservation Ticket
+                            </h3>
+                            <h2 style={{ fontSize: '24px', fontWeight: 700 }}>
+                                {booking.spaceTitle}
+                            </h2>
+                            <p style={{ opacity: 0.8, marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                                <FiMapPin size={14} />
+                                {booking.location || 'Location on file'}
                             </p>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                        {/* Ticket Body */}
+                        <div style={{ padding: '24px' }}>
+                            {/* Confirmation Number */}
+                            <div style={{
+                                background: '#f0f9ff',
+                                borderRadius: '8px',
+                                padding: '16px',
+                                textAlign: 'center',
+                                marginBottom: '24px'
+                            }}>
+                                <p style={{ fontSize: '12px', color: '#6a7282', marginBottom: '4px' }}>Confirmation Number</p>
+                                <p style={{ fontSize: '24px', fontWeight: 700, color: '#2563eb', letterSpacing: '2px' }}>
+                                    {confirmationNumber}
+                                </p>
+                            </div>
+
+                            {/* Ticket Details Grid */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                <div style={{ padding: '16px', background: '#f5f5f4', borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6a7282', marginBottom: '4px' }}>
+                                        <FiCalendar size={16} />
+                                        <span style={{ fontSize: '12px', textTransform: 'uppercase' }}>Date</span>
+                                    </div>
+                                    <p style={{ fontWeight: 700, fontSize: '16px', color: '#1e3a8a' }}>
+                                        {booking.startDate}
+                                        {booking.startDate !== booking.endDate && ` - ${booking.endDate}`}
+                                    </p>
+                                </div>
+
+                                <div style={{ padding: '16px', background: '#f5f5f4', borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6a7282', marginBottom: '4px' }}>
+                                        <FiClock size={16} />
+                                        <span style={{ fontSize: '12px', textTransform: 'uppercase' }}>Time</span>
+                                    </div>
+                                    <p style={{ fontWeight: 700, fontSize: '16px', color: '#1e3a8a' }}>
+                                        {booking.bookingType === 'hourly' 
+                                            ? `${booking.startTime} - ${booking.endTime}`
+                                            : 'Full Day Access'
+                                        }
+                                    </p>
+                                </div>
+
+                                <div style={{ padding: '16px', background: '#f5f5f4', borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6a7282', marginBottom: '4px' }}>
+                                        <FiUser size={16} />
+                                        <span style={{ fontSize: '12px', textTransform: 'uppercase' }}>Guest</span>
+                                    </div>
+                                    <p style={{ fontWeight: 700, fontSize: '16px', color: '#1e3a8a' }}>
+                                        {user?.name || booking.fullName}
+                                    </p>
+                                </div>
+
+                                <div style={{ padding: '16px', background: '#f5f5f4', borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6a7282', marginBottom: '4px' }}>
+                                        <FiCreditCard size={16} />
+                                        <span style={{ fontSize: '12px', textTransform: 'uppercase' }}>Amount Paid</span>
+                                    </div>
+                                    <p style={{ fontWeight: 700, fontSize: '16px', color: '#10b981' }}>
+                                        ${booking.totalAmount.toFixed(2)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Status Badge */}
+                            <div style={{ textAlign: 'center', marginTop: '24px' }}>
+                                <span style={{
+                                    background: '#dcfce7',
+                                    color: '#16a34a',
+                                    padding: '8px 24px',
+                                    borderRadius: '20px',
+                                    fontWeight: 600,
+                                    fontSize: '14px'
+                                }}>
+                                    ✓ CONFIRMED & PAID
+                                </span>
+                            </div>
+
+                            {/* Note */}
+                            <p style={{ 
+                                textAlign: 'center', 
+                                marginTop: '24px', 
+                                fontSize: '14px', 
+                                color: '#6a7282',
+                                padding: '16px',
+                                background: '#fefce8',
+                                borderRadius: '8px'
+                            }}>
+                                📧 A confirmation email has been sent to <strong>{user?.email || booking.email}</strong>
+                                <br />
+                                <span style={{ fontSize: '12px' }}>Please show this ticket upon arrival</span>
+                            </p>
+                        </div>
+
+                        {/* Ticket Footer */}
+                        <div style={{
+                            borderTop: '2px dashed #e5e7eb',
+                            padding: '24px',
+                            display: 'flex',
+                            gap: '12px',
+                            justifyContent: 'center'
+                        }}>
                             <button className="btn btn-primary" onClick={() => navigate('/profile')}>
                                 View My Bookings
                             </button>
