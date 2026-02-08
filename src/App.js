@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/App.js - Spaces for Rent
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -77,5 +76,3 @@ function App() {
 }
 
 export default App;
-=======
->>>>>>> 00dcceae84ca72d17a50aa7de251aa69aa7f416f
