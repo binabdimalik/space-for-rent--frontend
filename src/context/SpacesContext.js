@@ -228,6 +228,20 @@ export const SpacesProvider = ({ children }) => {
         return spaces.find(s => s.id === parseInt(id));
     };
 
+    /**
+     * Get spaces owned by a specific user
+     * Used for owner dashboard in profile page
+     * @param {number|string} userId - User ID or email
+     * @returns {Array} - Array of spaces owned by the user
+     */
+    const getSpacesByOwner = (userId, userEmail) => {
+        return spaces.filter(s => 
+            s.submitted_by && 
+            (s.submitted_by.id === userId || s.submitted_by.email === userEmail) &&
+            s.verification_status === 'verified'
+        );
+    };
+
     // Render the context provider with all space management functions
     return (
         <SpacesContext.Provider value={{
@@ -242,7 +256,8 @@ export const SpacesProvider = ({ children }) => {
             verifySpace,         // Function to verify pending space
             rejectSpace,         // Function to reject pending space
             getPendingSpaces,    // Function to get pending spaces
-            getVerifiedSpaces    // Function to get verified spaces
+            getVerifiedSpaces,   // Function to get verified spaces
+            getSpacesByOwner     // Function to get spaces by owner
         }}>
             {children}
         </SpacesContext.Provider>
