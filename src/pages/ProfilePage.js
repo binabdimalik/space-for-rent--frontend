@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiUser, FiMail, FiCalendar, FiMapPin, FiClock, FiEdit2, FiHome, FiPlus, FiX, FiCreditCard, FiCheck } from 'react-icons/fi';
+import { FiUser, FiMail, FiCalendar, FiMapPin, FiClock, FiEdit2, FiHome, FiPlus, FiX, FiCreditCard, FiCheck, FiDollarSign, FiTrendingUp } from 'react-icons/fi';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { AuthContext } from '../context/AuthContext';
 import { BookingsContext } from '../context/BookingsContext';
@@ -18,13 +18,18 @@ L.Icon.Default.mergeOptions({
 
 const ProfilePage = () => {
     const { user, logout } = useContext(AuthContext);
-    const { bookings: allBookings, getBookingsByClient } = useContext(BookingsContext);
-    const { getSpaceById } = useContext(SpacesContext);
+    const { bookings: allBookings, getBookingsByClient, getBookingsBySpace } = useContext(BookingsContext);
+    const { getSpaceById, getSpacesByOwner, spaces } = useContext(SpacesContext);
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('bookings');
     const [selectedTicket, setSelectedTicket] = useState(null);
+    const [mySpaces, setMySpaces] = useState([]);
+    const [spaceBookings, setSpaceBookings] = useState([]);
+    
+    // Company fee percentage (10%)
+    const COMPANY_FEE_PERCENT = 10;
     
     // Location coordinates for common locations
     const getLocationCoordinates = (location) => {
@@ -113,6 +118,30 @@ const ProfilePage = () => {
         setLoading(false);
     }, [user, navigate, getBookingsByClient, allBookings, getSpaceById]);
 
+    // Fetch owner's spaces and bookings on those spaces
+    useEffect(() => {
+        if (!user) return;
+        
+        // Get spaces owned by this user
+        const ownerSpaces = getSpacesByOwner(user.id, user.email);
+        setMySpaces(ownerSpaces);
+        
+        // Get all bookings for owner's spaces
+        let allSpaceBookings = [];
+        ownerSpaces.forEach(space => {
+            const bookingsForSpace = getBookingsBySpace(space.id);
+            bookingsForSpace.forEach(booking => {
+                allSpaceBookings.push({
+                    ...booking,
+                    spaceName: space.title,
+                    spaceLocation: space.location,
+                    spaceImage: space.image_url
+                });
+            });
+        });
+        setSpaceBookings(allSpaceBookings);
+    }, [user, spaces, getSpacesByOwner, getBookingsBySpace]);
+
     const getStatusBadgeClass = (status) => {
         switch (status) {
             case 'confirmed': return 'status-available';
@@ -195,6 +224,15 @@ const ProfilePage = () => {
                     >
                         My Bookings
                     </button>
+                    {mySpaces.length > 0 && (
+                        <button 
+                            className={`btn ${activeTab === 'myspaces' ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setActiveTab('myspaces')}
+                        >
+                            <FiHome size={14} style={{ marginRight: '6px' }} />
+                            My Spaces ({mySpaces.length})
+                        </button>
+                    )}
                     <button 
                         className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-ghost'}`}
                         onClick={() => setActiveTab('settings')}
@@ -265,6 +303,159 @@ const ProfilePage = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'myspaces' && (
+                    <div>
+                        {/* Income Summary */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                            gap: '16px',
+                            marginBottom: '24px'
+                        }}>
+                            <div style={{
+                                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                                borderRadius: '12px',
+                                padding: '20px',
+                                color: 'white'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                    <FiDollarSign size={20} />
+                                    <span style={{ fontSize: '14px', opacity: 0.9 }}>Total Earnings</span>
+                                </div>
+                                <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                                    ${spaceBookings.filter(b => b.status === 'confirmed' || b.status === 'completed').reduce((sum, b) => sum + (b.totalAmount || 0), 0).toFixed(2)}
+                                </div>
+                            </div>
+                            <div style={{
+                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                borderRadius: '12px',
+                                padding: '20px',
+                                color: 'white'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                    <FiTrendingUp size={20} />
+                                    <span style={{ fontSize: '14px', opacity: 0.9 }}>Your Income (after {COMPANY_FEE_PERCENT}% fee)</span>
+                                </div>
+                                <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                                    ${(spaceBookings.filter(b => b.status === 'confirmed' || b.status === 'completed').reduce((sum, b) => sum + (b.totalAmount || 0), 0) * (1 - COMPANY_FEE_PERCENT / 100)).toFixed(2)}
+                                </div>
+                            </div>
+                            <div style={{
+                                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                borderRadius: '12px',
+                                padding: '20px',
+                                color: 'white'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                    <FiCalendar size={20} />
+                                    <span style={{ fontSize: '14px', opacity: 0.9 }}>Total Bookings</span>
+                                </div>
+                                <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                                    {spaceBookings.length}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* My Listed Spaces */}
+                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e3a8a', marginBottom: '16px' }}>
+                            Your Listed Spaces
+                        </h2>
+                        <div style={{ display: 'grid', gap: '16px', marginBottom: '32px' }}>
+                            {mySpaces.map(space => (
+                                <div key={space.id} style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '16px',
+                                    display: 'flex',
+                                    gap: '16px',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                    alignItems: 'center'
+                                }}>
+                                    <img 
+                                        src={space.image_url} 
+                                        alt={space.title}
+                                        style={{
+                                            width: '80px',
+                                            height: '80px',
+                                            borderRadius: '8px',
+                                            objectFit: 'cover'
+                                        }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                        <h3 style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '4px' }}>
+                                            {space.title}
+                                        </h3>
+                                        <p style={{ color: '#6b7280', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <FiMapPin size={14} />
+                                            {space.location}
+                                        </p>
+                                        <p style={{ color: '#2563eb', fontWeight: 600, marginTop: '4px' }}>
+                                            ${space.price_per_hour}/hour
+                                        </p>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span className={`status-badge status-${space.status || 'available'}`}>
+                                            {space.status || 'Available'}
+                                        </span>
+                                        <p style={{ color: '#6b7280', fontSize: '12px', marginTop: '8px' }}>
+                                            {spaceBookings.filter(b => b.spaceId === space.id).length} bookings
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Bookings on My Spaces */}
+                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e3a8a', marginBottom: '16px' }}>
+                            Bookings on Your Spaces
+                        </h2>
+                        {spaceBookings.length === 0 ? (
+                            <div className="empty-state" style={{ background: 'white', borderRadius: '12px' }}>
+                                <div className="empty-state-icon">📅</div>
+                                <p>No bookings on your spaces yet.</p>
+                            </div>
+                        ) : (
+                            <div style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                            }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead>
+                                        <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Space</th>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Client</th>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Date</th>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Amount</th>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Your Earnings</th>
+                                            <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {spaceBookings.map(booking => (
+                                            <tr key={booking.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                                                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 500 }}>{booking.spaceName}</td>
+                                                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#6b7280' }}>{booking.clientName || booking.clientEmail}</td>
+                                                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#6b7280' }}>{booking.startDate}</td>
+                                                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 600 }}>${booking.totalAmount}</td>
+                                                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: 600, color: '#059669' }}>
+                                                    ${(booking.totalAmount * (1 - COMPANY_FEE_PERCENT / 100)).toFixed(2)}
+                                                </td>
+                                                <td style={{ padding: '12px 16px' }}>
+                                                    <span className={`status-badge ${getStatusBadgeClass(booking.status)}`}>
+                                                        {booking.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </div>
