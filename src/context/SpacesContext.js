@@ -229,12 +229,27 @@ export const SpacesProvider = ({ children }) => {
     };
 
     /**
-     * Get spaces owned by a specific user
-     * Used for owner dashboard in profile page
-     * @param {number|string} userId - User ID or email
-     * @returns {Array} - Array of spaces owned by the user
+     * Get ALL spaces submitted by a specific user (verified + pending)
+     * Used for owner dashboard in profile page to show all submitted spaces
+     * @param {number|string} userId - User ID
+     * @param {string} userEmail - User email
+     * @returns {Array} - Array of all spaces submitted by the user
      */
     const getSpacesByOwner = (userId, userEmail) => {
+        return spaces.filter(s => 
+            s.submitted_by && 
+            (s.submitted_by.id === userId || s.submitted_by.email === userEmail)
+        );
+    };
+
+    /**
+     * Get only VERIFIED spaces owned by a specific user
+     * Used for calculating bookings and revenue
+     * @param {number|string} userId - User ID
+     * @param {string} userEmail - User email
+     * @returns {Array} - Array of verified spaces owned by the user
+     */
+    const getVerifiedSpacesByOwner = (userId, userEmail) => {
         return spaces.filter(s => 
             s.submitted_by && 
             (s.submitted_by.id === userId || s.submitted_by.email === userEmail) &&
@@ -257,7 +272,8 @@ export const SpacesProvider = ({ children }) => {
             rejectSpace,         // Function to reject pending space
             getPendingSpaces,    // Function to get pending spaces
             getVerifiedSpaces,   // Function to get verified spaces
-            getSpacesByOwner     // Function to get spaces by owner
+            getSpacesByOwner,    // Function to get all spaces by owner
+            getVerifiedSpacesByOwner  // Function to get verified spaces by owner
         }}>
             {children}
         </SpacesContext.Provider>

@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
 const ProfilePage = () => {
     const { user, logout } = useContext(AuthContext);
     const { bookings: allBookings, getBookingsByClient, getBookingsBySpace } = useContext(BookingsContext);
-    const { getSpaceById, getSpacesByOwner, spaces } = useContext(SpacesContext);
+    const { getSpaceById, getSpacesByOwner, getVerifiedSpacesByOwner, spaces } = useContext(SpacesContext);
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -122,13 +122,16 @@ const ProfilePage = () => {
     useEffect(() => {
         if (!user) return;
         
-        // Get spaces owned by this user
-        const ownerSpaces = getSpacesByOwner(user.id, user.email);
-        setMySpaces(ownerSpaces);
+        // Get ALL spaces submitted by this user (verified + pending)
+        const allOwnerSpaces = getSpacesByOwner(user.id, user.email);
+        setMySpaces(allOwnerSpaces);
         
-        // Get all bookings for owner's spaces
+        // Get only VERIFIED spaces for bookings/revenue calculation
+        const verifiedOwnerSpaces = getVerifiedSpacesByOwner(user.id, user.email);
+        
+        // Get all bookings for owner's VERIFIED spaces only
         let allSpaceBookings = [];
-        ownerSpaces.forEach(space => {
+        verifiedOwnerSpaces.forEach(space => {
             const bookingsForSpace = getBookingsBySpace(space.id);
             bookingsForSpace.forEach(booking => {
                 allSpaceBookings.push({
@@ -140,7 +143,7 @@ const ProfilePage = () => {
             });
         });
         setSpaceBookings(allSpaceBookings);
-    }, [user, spaces, getSpacesByOwner, getBookingsBySpace]);
+    }, [user, spaces, getSpacesByOwner, getVerifiedSpacesByOwner, getBookingsBySpace]);
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -361,10 +364,49 @@ const ProfilePage = () => {
                             </div>
                         </div>
 
+                        {/* Spaces Summary */}
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '12px', 
+                            marginBottom: '16px',
+                            flexWrap: 'wrap'
+                        }}>
+                            <div style={{
+                                background: '#dcfce7',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color: '#166534'
+                            }}>
+                                ✓ {mySpaces.filter(s => s.verification_status === 'verified').length} Verified
+                            </div>
+                            <div style={{
+                                background: '#fef3c7',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color: '#92400e'
+                            }}>
+                                ⏳ {mySpaces.filter(s => s.verification_status === 'pending').length} Pending Review
+                            </div>
+                        </div>
+
                         {/* My Listed Spaces */}
                         <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e3a8a', marginBottom: '16px' }}>
                             Your Listed Spaces
                         </h2>
+                        {mySpaces.length === 0 ? (
+                            <div className="empty-state" style={{ background: 'white', borderRadius: '12px', marginBottom: '32px' }}>
+                                <div className="empty-state-icon">🏠</div>
+                                <p>You haven't listed any spaces yet.</p>
+                                <Link to="/list-space" className="btn btn-primary" style={{ marginTop: '16px' }}>
+                                    <FiPlus size={14} style={{ marginRight: '6px' }} />
+                                    List Your First Space
+                                </Link>
+                            </div>
+                        ) : (
                         <div style={{ display: 'grid', gap: '16px', marginBottom: '32px' }}>
                             {mySpaces.map(space => (
                                 <div key={space.id} style={{
@@ -374,18 +416,38 @@ const ProfilePage = () => {
                                     display: 'flex',
                                     gap: '16px',
                                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    border: space.verification_status === 'pending' ? '2px solid #f59e0b' : '1px solid transparent'
                                 }}>
-                                    <img 
-                                        src={space.image_url} 
-                                        alt={space.title}
-                                        style={{
-                                            width: '80px',
-                                            height: '80px',
-                                            borderRadius: '8px',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
+                                    <div style={{ position: 'relative' }}>
+                                        <img 
+                                            src={space.image_url} 
+                                            alt={space.title}
+                                            style={{
+                                                width: '80px',
+                                                height: '80px',
+                                                borderRadius: '8px',
+                                                objectFit: 'cover',
+                                                opacity: space.verification_status === 'pending' ? 0.7 : 1
+                                            }}
+                                        />
+                                        {space.verification_status === 'pending' && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                background: 'rgba(245, 158, 11, 0.9)',
+                                                borderRadius: '4px',
+                                                padding: '2px 6px',
+                                                fontSize: '10px',
+                                                fontWeight: 600,
+                                                color: 'white'
+                                            }}>
+                                                PENDING
+                                            </div>
+                                        )}
+                                    </div>
                                     <div style={{ flex: 1 }}>
                                         <h3 style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: '4px' }}>
                                             {space.title}
@@ -399,16 +461,39 @@ const ProfilePage = () => {
                                         </p>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span className={`status-badge status-${space.status || 'available'}`}>
-                                            {space.status || 'Available'}
+                                        {/* Verification Status Badge */}
+                                        <span style={{
+                                            display: 'inline-block',
+                                            padding: '4px 10px',
+                                            borderRadius: '20px',
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            background: space.verification_status === 'verified' ? '#dcfce7' : '#fef3c7',
+                                            color: space.verification_status === 'verified' ? '#166534' : '#92400e',
+                                            marginBottom: '8px'
+                                        }}>
+                                            {space.verification_status === 'verified' ? '✓ Verified' : '⏳ Pending Review'}
                                         </span>
-                                        <p style={{ color: '#6b7280', fontSize: '12px', marginTop: '8px' }}>
-                                            {spaceBookings.filter(b => b.spaceId === space.id).length} bookings
-                                        </p>
+                                        {space.verification_status === 'verified' && (
+                                            <>
+                                                <p style={{ color: '#6b7280', fontSize: '12px' }}>
+                                                    {spaceBookings.filter(b => b.spaceId === space.id).length} bookings
+                                                </p>
+                                                <p style={{ color: '#059669', fontSize: '12px', fontWeight: 600 }}>
+                                                    ${(spaceBookings.filter(b => b.spaceId === space.id && (b.status === 'confirmed' || b.status === 'completed')).reduce((sum, b) => sum + (b.totalAmount || 0), 0) * (1 - COMPANY_FEE_PERCENT / 100)).toFixed(2)} earned
+                                                </p>
+                                            </>
+                                        )}
+                                        {space.verification_status === 'pending' && (
+                                            <p style={{ color: '#92400e', fontSize: '11px', marginTop: '4px' }}>
+                                                Awaiting admin approval
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             ))}
                         </div>
+                        )}
 
                         {/* Bookings on My Spaces */}
                         <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e3a8a', marginBottom: '16px' }}>

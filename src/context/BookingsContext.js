@@ -105,13 +105,61 @@ export const BookingsProvider = ({ children }) => {
     }, [bookings]); // Re-run when bookings array changes
 
     /**
-     * Create a new booking
+     * Create a new booking with conflict prevention
      * Called when a client completes the payment process
+     * Enforces double-booking prevention at the context level
      * @param {Object} bookingData - Booking details from the payment form
-     * @returns {Object} - The newly created booking object
+     * @returns {Object} - { success: boolean, booking: Object|null, error: string|null }
      */
     const addBooking = (bookingData) => {
-        // Create new booking object with system-generated fields
+        // CRITICAL: Check for conflicts before creating booking
+        const spaceBookings = bookings.filter(b => 
+            b.spaceId === parseInt(bookingData.spaceId) && 
+            b.status !== 'cancelled'
+        );
+
+        // Check each existing booking for date/time overlap
+        for (const existing of spaceBookings) {
+            const bookingStart = new Date(existing.startDate);
+            const bookingEnd = new Date(existing.endDate);
+            const requestStart = new Date(bookingData.startDate);
+            const requestEnd = new Date(bookingData.endDate);
+
+            const datesOverlap = requestStart <= bookingEnd && requestEnd >= bookingStart;
+
+            if (datesOverlap) {
+                // For daily bookings, any date overlap is a conflict
+                if (bookingData.bookingType === 'daily' || existing.bookingType === 'daily') {
+                    console.warn('Booking conflict detected - space already booked for these dates');
+                    return { 
+                        success: false, 
+                        booking: null, 
+                        error: `Space already booked from ${existing.startDate} to ${existing.endDate}` 
+                    };
+                }
+
+                // For hourly bookings on the same day, check time overlap
+                if (bookingData.startDate === existing.startDate && bookingData.startTime && existing.startTime) {
+                    const reqStartTime = parseInt(bookingData.startTime.replace(':', ''));
+                    const reqEndTime = parseInt(bookingData.endTime.replace(':', ''));
+                    const bookStartTime = parseInt(existing.startTime.replace(':', ''));
+                    const bookEndTime = parseInt(existing.endTime.replace(':', ''));
+
+                    const timesOverlap = reqStartTime < bookEndTime && reqEndTime > bookStartTime;
+
+                    if (timesOverlap) {
+                        console.warn('Booking conflict detected - time slot already taken');
+                        return { 
+                            success: false, 
+                            booking: null, 
+                            error: `Time slot already booked on ${existing.startDate} from ${existing.startTime} to ${existing.endTime}` 
+                        };
+                    }
+                }
+            }
+        }
+
+        // No conflict - create new booking object with system-generated fields
         const newBooking = {
             ...bookingData,                                    // Spread the provided booking data
             id: Date.now(),                                    // Generate unique ID using timestamp
@@ -123,8 +171,8 @@ export const BookingsProvider = ({ children }) => {
         // Add new booking to the bookings array
         setBookings(prev => [...prev, newBooking]);
         
-        // Return the created booking
-        return newBooking;
+        // Return success with the created booking
+        return { success: true, booking: newBooking, error: null };
     };
 
     /**
