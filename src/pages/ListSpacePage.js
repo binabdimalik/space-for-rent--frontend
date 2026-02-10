@@ -42,6 +42,18 @@ const ListSpacePage = () => {
     });
     const [mapPosition, setMapPosition] = useState(null);
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
+
+    // Validation functions
+    const validatePrice = (price) => {
+        const num = parseFloat(price);
+        return !isNaN(num) && num > 0;
+    };
+
+    const validateCapacity = (capacity) => {
+        const num = parseInt(capacity);
+        return !isNaN(num) && num > 0 && num <= 1000;
+    };
 
     useEffect(() => {
         if (!user) {
@@ -57,25 +69,71 @@ const ListSpacePage = () => {
     }, [user, navigate]);
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        
+        // Clear field error when user starts typing
+        setFieldErrors(prev => ({ ...prev, [name]: '' }));
+        
+        // For price field, only allow numbers and decimal
+        if (name === 'price_per_hour') {
+            const cleanValue = value.replace(/[^\d.]/g, '');
+            setFormData({ ...formData, [name]: cleanValue });
+            return;
+        }
+        
+        // For capacity field, only allow numbers
+        if (name === 'capacity') {
+            const cleanValue = value.replace(/\D/g, '');
+            setFormData({ ...formData, [name]: cleanValue });
+            return;
+        }
+        
+        setFormData({ ...formData, [name]: value });
         setError('');
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        
+        if (!formData.title.trim()) {
+            errors.title = 'Space title is required';
+        } else if (formData.title.trim().length < 3) {
+            errors.title = 'Title must be at least 3 characters';
+        }
+        
+        if (!formData.description.trim()) {
+            errors.description = 'Description is required';
+        } else if (formData.description.trim().length < 20) {
+            errors.description = 'Description must be at least 20 characters';
+        }
+        
+        if (!formData.location.trim()) {
+            errors.location = 'Location is required';
+        }
+        
+        if (!formData.price_per_hour) {
+            errors.price_per_hour = 'Price is required';
+        } else if (!validatePrice(formData.price_per_hour)) {
+            errors.price_per_hour = 'Please enter a valid price greater than 0';
+        }
+        
+        if (!formData.capacity) {
+            errors.capacity = 'Capacity is required';
+        } else if (!validateCapacity(formData.capacity)) {
+            errors.capacity = 'Please enter a valid capacity (1-1000)';
+        }
+        
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setError('');
 
-        // Validation
-        if (!formData.title || !formData.description || !formData.location || !formData.price_per_hour || !formData.capacity) {
-            setError('Please fill in all required fields.');
-            return;
-        }
-
-        if (parseFloat(formData.price_per_hour) <= 0) {
-            setError('Price must be greater than 0.');
+        // Validate form
+        if (!validateForm()) {
+            setError('Please correct the errors in the form.');
             return;
         }
 
@@ -257,10 +315,12 @@ const ListSpacePage = () => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className="form-input"
+                                className={`form-input ${fieldErrors.title ? 'input-error' : ''}`}
                                 placeholder="e.g., Modern Conference Room"
-                                required
                             />
+                            {fieldErrors.title && (
+                                <span className="field-error">{fieldErrors.title}</span>
+                            )}
                         </div>
 
                         {/* Description */}
@@ -281,12 +341,14 @@ const ListSpacePage = () => {
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
-                                className="form-input"
+                                className={`form-input ${fieldErrors.description ? 'input-error' : ''}`}
                                 placeholder="Describe your space, its features, and what makes it unique..."
                                 rows={4}
                                 style={{ resize: 'vertical' }}
-                                required
                             />
+                            {fieldErrors.description && (
+                                <span className="field-error">{fieldErrors.description}</span>
+                            )}
                         </div>
 
                         {/* Location */}
@@ -308,10 +370,12 @@ const ListSpacePage = () => {
                                 name="location"
                                 value={formData.location}
                                 onChange={handleChange}
-                                className="form-input"
+                                className={`form-input ${fieldErrors.location ? 'input-error' : ''}`}
                                 placeholder="e.g., 123 Main St, New York, NY"
-                                required
                             />
+                            {fieldErrors.location && (
+                                <span className="field-error">{fieldErrors.location}</span>
+                            )}
                         </div>
 
                         {/* Map Location Picker */}
@@ -368,15 +432,16 @@ const ListSpacePage = () => {
                                     Price per Hour ($) *
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="price_per_hour"
                                     value={formData.price_per_hour}
                                     onChange={handleChange}
-                                    className="form-input"
+                                    className={`form-input ${fieldErrors.price_per_hour ? 'input-error' : ''}`}
                                     placeholder="e.g., 50"
-                                    min="1"
-                                    required
                                 />
+                                {fieldErrors.price_per_hour && (
+                                    <span className="field-error">{fieldErrors.price_per_hour}</span>
+                                )}
                             </div>
                             <div>
                                 <label style={{ 
@@ -392,15 +457,16 @@ const ListSpacePage = () => {
                                     Capacity (people) *
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="capacity"
                                     value={formData.capacity}
                                     onChange={handleChange}
-                                    className="form-input"
+                                    className={`form-input ${fieldErrors.capacity ? 'input-error' : ''}`}
                                     placeholder="e.g., 20"
-                                    min="1"
-                                    required
                                 />
+                                {fieldErrors.capacity && (
+                                    <span className="field-error">{fieldErrors.capacity}</span>
+                                )}
                             </div>
                         </div>
 
