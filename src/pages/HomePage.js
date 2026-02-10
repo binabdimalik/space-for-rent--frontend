@@ -128,7 +128,7 @@ function HomePage() {
       <section className="section how-it-works">
         <h2 className="section-title section-title-center">How It Works</h2>
         <div className="how-it-works-grid">
-          <div className="how-it-works-card">
+          <Link to="/spaces" className="how-it-works-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             <div className="how-it-works-icon">
               <FiSearch size={28} />
             </div>
@@ -136,8 +136,8 @@ function HomePage() {
             <p className="how-it-works-description">
               Search and browse available spaces.
             </p>
-          </div>
-          <div className="how-it-works-card">
+          </Link>
+          <Link to="/spaces" className="how-it-works-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             <div className="how-it-works-icon">
               <FiCalendar size={28} />
             </div>
@@ -145,8 +145,8 @@ function HomePage() {
             <p className="how-it-works-description">
               Reserve your space for the desired time.
             </p>
-          </div>
-          <div className="how-it-works-card">
+          </Link>
+          <Link to="/profile" className="how-it-works-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             <div className="how-it-works-icon">
               <FiCheckCircle size={28} />
             </div>
@@ -154,7 +154,7 @@ function HomePage() {
             <p className="how-it-works-description">
               Show up and enjoy your booked space.
             </p>
-          </div>
+          </Link>
         </div>
       </section>
 
