@@ -9,7 +9,11 @@
 
 **A modern platform for discovering and booking unique spaces for any activity**
 
-[Live Demo](http://localhost:3000) · [Backend Repo](https://github.com/binabdimalik/space-for-rent-backend) · [Report Bug](https://github.com/binabdimalik/space-for-rent--frontend/issues)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-rentalhub.dpdns.org-00C853?style=for-the-badge)](https://rentalhub.dpdns.org)
+
+[🚀 Live Demo](https://rentalhub.dpdns.org) · [Backend Repo](https://github.com/binabdimalik/space-for-rent-backend) · [Report Bug](https://github.com/binabdimalik/space-for-rent--frontend/issues)
+
+> **Deployed on Ubuntu 24.04 VPS with Nginx reverse proxy and Cloudflare**
 
 </div>
 
