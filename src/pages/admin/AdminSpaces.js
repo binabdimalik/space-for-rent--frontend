@@ -172,7 +172,15 @@ const AdminSpaces = () => {
     if (editingSpace) {
       updateSpace(editingSpace.id, formData);
     } else {
-      addSpace(formData, true);
+      // Add space with admin owner tracking for booking monitoring
+      addSpace({
+        ...formData,
+        submitted_by: {
+          id: user?.id,
+          name: user?.name || 'Admin',
+          email: user?.email
+        }
+      }, true);
     }
 
     setShowModal(false);

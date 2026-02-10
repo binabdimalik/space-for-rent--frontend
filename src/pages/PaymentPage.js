@@ -9,7 +9,7 @@ const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
-    const { addBooking } = useContext(BookingsContext);
+    const { addBooking, checkBookingConflict } = useContext(BookingsContext);
     const booking = location.state?.booking;
 
     const [paymentMethod, setPaymentMethod] = useState('card');
@@ -21,6 +21,7 @@ const PaymentPage = () => {
     });
     const [processing, setProcessing] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [conflictError, setConflictError] = useState(null);
 
     // Redirect if no booking data
     if (!booking) {
@@ -65,6 +66,7 @@ const PaymentPage = () => {
 
     const handlePayment = async (e) => {
         e.preventDefault();
+        setConflictError(null);
         
         if (paymentMethod === 'card') {
             if (!cardData.cardNumber || !cardData.cardName || !cardData.expiry || !cardData.cvv) {
@@ -73,12 +75,44 @@ const PaymentPage = () => {
             }
         }
 
+        // CRITICAL: Final check for booking conflicts before processing payment
+        // This prevents double booking if another user booked the same slot
+        const conflict = checkBookingConflict(
+            booking.spaceId,
+            booking.startDate,
+            booking.endDate,
+            booking.startTime,
+            booking.endTime,
+            booking.bookingType
+        );
+
+        if (conflict.hasConflict) {
+            setConflictError(conflict.message || 'This space has already been booked for your selected dates/times. Please go back and choose different dates.');
+            return;
+        }
+
         setProcessing(true);
 
         // Simulate payment processing
         setTimeout(() => {
+            // Double-check conflict again right before saving (race condition prevention)
+            const finalCheck = checkBookingConflict(
+                booking.spaceId,
+                booking.startDate,
+                booking.endDate,
+                booking.startTime,
+                booking.endTime,
+                booking.bookingType
+            );
+
+            if (finalCheck.hasConflict) {
+                setProcessing(false);
+                setConflictError('Sorry, this slot was just booked by another user. Please select different dates/times.');
+                return;
+            }
+
             // Save booking to context - use logged-in user's info for proper filtering
-            addBooking({
+            const result = addBooking({
                 spaceId: booking.spaceId,
                 spaceTitle: booking.spaceTitle,
                 location: booking.location || 'N/A',
@@ -94,6 +128,13 @@ const PaymentPage = () => {
                 totalAmount: booking.totalAmount,
                 paymentMethod: paymentMethod
             });
+
+            // Handle booking creation result
+            if (!result.success) {
+                setProcessing(false);
+                setConflictError(result.error || 'Booking failed due to a conflict. Please try again.');
+                return;
+            }
             
             setProcessing(false);
             setSuccess(true);
@@ -286,6 +327,49 @@ const PaymentPage = () => {
                     <div className="payment-form-section">
                         <h2 className="payment-title">Complete Payment</h2>
                         <p className="payment-subtitle">Choose your payment method</p>
+
+                        {/* Conflict Error Alert */}
+                        {conflictError && (
+                            <div style={{
+                                background: '#fef2f2',
+                                border: '1px solid #fecaca',
+                                borderRadius: '8px',
+                                padding: '16px',
+                                marginBottom: '20px',
+                                display: 'flex',
+                                gap: '12px',
+                                alignItems: 'flex-start'
+                            }}>
+                                <div style={{
+                                    background: '#dc2626',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    width: '24px',
+                                    height: '24px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                    fontSize: '14px',
+                                    fontWeight: 700
+                                }}>!</div>
+                                <div>
+                                    <p style={{ fontWeight: 600, color: '#991b1b', marginBottom: '4px' }}>
+                                        Booking Conflict Detected
+                                    </p>
+                                    <p style={{ color: '#b91c1c', fontSize: '14px', marginBottom: '12px' }}>
+                                        {conflictError}
+                                    </p>
+                                    <button 
+                                        onClick={() => navigate(-1)}
+                                        className="btn btn-outline"
+                                        style={{ borderColor: '#dc2626', color: '#dc2626', fontSize: '13px', padding: '8px 16px' }}
+                                    >
+                                        ← Go Back & Select New Dates
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Payment Method Selection */}
                         <div className="payment-methods">

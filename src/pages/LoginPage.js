@@ -21,13 +21,70 @@ const LoginPage = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState({});
+
+    // Validation functions
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validateName = (name) => {
+        const nameRegex = /^[a-zA-Z\s\-'\.]+$/;
+        return nameRegex.test(name) && name.trim().length >= 2;
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 6;
+    };
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
         setError('');
+        setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        
+        // Validate name (only for registration)
+        if (!isLogin) {
+            if (!formData.name.trim()) {
+                errors.name = 'Full name is required';
+            } else if (!validateName(formData.name)) {
+                errors.name = 'Please enter a valid name (letters only)';
+            }
+        }
+        
+        // Validate email
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!validateEmail(formData.email)) {
+            errors.email = 'Please enter a valid email address';
+        }
+        
+        // Validate password
+        if (!formData.password) {
+            errors.password = 'Password is required';
+        } else if (!isLogin && !validatePassword(formData.password)) {
+            errors.password = 'Password must be at least 6 characters';
+        }
+        
+        // Validate confirm password (only for registration)
+        if (!isLogin) {
+            if (!formData.confirmPassword) {
+                errors.confirmPassword = 'Please confirm your password';
+            } else if (formData.password !== formData.confirmPassword) {
+                errors.confirmPassword = 'Passwords do not match';
+            }
+        }
+        
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
@@ -35,8 +92,8 @@ const LoginPage = () => {
         setLoading(true);
         setError('');
 
-        if (!isLogin && formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+        // Validate form first
+        if (!validateForm()) {
             setLoading(false);
             return;
         }
@@ -226,67 +283,75 @@ const LoginPage = () => {
                             <div className="form-group">
                                 <label className="form-label">
                                     <FiUser size={16} />
-                                    Full Name
+                                    Full Name *
                                 </label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className="form-input"
+                                    className={`form-input ${fieldErrors.name ? 'input-error' : ''}`}
                                     placeholder="Enter your full name"
-                                    required={!isLogin}
                                 />
+                                {fieldErrors.name && (
+                                    <span className="field-error">{fieldErrors.name}</span>
+                                )}
                             </div>
                         )}
 
                         <div className="form-group">
                             <label className="form-label">
                                 <FiMail size={16} />
-                                Email Address
+                                Email Address *
                             </label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="form-input"
+                                className={`form-input ${fieldErrors.email ? 'input-error' : ''}`}
                                 placeholder="Enter your email"
-                                required
                             />
+                            {fieldErrors.email && (
+                                <span className="field-error">{fieldErrors.email}</span>
+                            )}
                         </div>
 
                         <div className="form-group">
                             <label className="form-label">
                                 <FiLock size={16} />
-                                Password
+                                Password *
                             </label>
                             <input
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="form-input"
+                                className={`form-input ${fieldErrors.password ? 'input-error' : ''}`}
                                 placeholder="Enter your password"
-                                required
                             />
+                            {fieldErrors.password && (
+                                <span className="field-error">{fieldErrors.password}</span>
+                            )}
                         </div>
 
                         {!isLogin && (
                             <div className="form-group">
                                 <label className="form-label">
                                     <FiLock size={16} />
-                                    Confirm Password
+                                    Confirm Password *
                                 </label>
                                 <input
                                     type="password"
                                     name="confirmPassword"
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
-                                    className="form-input"
+                                    className={`form-input ${fieldErrors.confirmPassword ? 'input-error' : ''}`}
                                     placeholder="Confirm your password"
-                                    required={!isLogin}
                                 />
+                                {fieldErrors.confirmPassword && (
+                                    <span className="field-error">{fieldErrors.confirmPassword}</span>
+                                )}
                             </div>
                         )}
 
