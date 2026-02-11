@@ -2,10 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? "https://your-backend-url.com"
-      : "http://localhost:5555",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5555",
 });
 
 export const getSpaces = () => API.get("/api/spaces");
