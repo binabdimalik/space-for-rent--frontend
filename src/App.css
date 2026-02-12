@@ -8,6 +8,10 @@
   box-sizing: border-box;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --primary-blue: #2563eb;
   --primary-blue-dark: #1e3a8a;
@@ -129,6 +133,7 @@ body {
   align-items: center;
   justify-content: space-between;
   height: 72px;
+  box-sizing: border-box;
 }
 
 .navbar-logo {
@@ -452,6 +457,8 @@ body {
   min-height: 580px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 .hero-content {
@@ -1207,6 +1214,8 @@ body {
   padding: 32px;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .spaces-header {
@@ -1477,12 +1486,15 @@ body {
 
 .form-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 16px 20px;
   border: 2px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  transition: all var(--transition-fast);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-family: inherit;
   background: var(--bg-white);
+  color: var(--text-dark);
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
 }
 
 .form-input:hover {

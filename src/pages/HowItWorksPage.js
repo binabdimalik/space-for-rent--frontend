@@ -101,11 +101,11 @@ const HowItWorksPage = () => {
                         >
                             <div style={{
                                 position: 'absolute',
-                                top: '-16px',
+                                top: '-1px',
                                 left: '50%',
                                 transform: 'translateX(-50%)',
-                                width: '32px',
-                                height: '32px',
+                                width: '40px',
+                                height: '50px',
                                 background: 'linear-gradient(135deg, #f97316, #fb923c)',
                                 borderRadius: '50%',
                                 display: 'flex',
@@ -113,7 +113,9 @@ const HowItWorksPage = () => {
                                 justifyContent: 'center',
                                 color: 'white',
                                 fontWeight: 700,
-                                fontSize: '14px'
+                                fontSize: '16px',
+                                boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)',
+                                zIndex: 10
                             }}>
                                 {index + 1}
                             </div>
@@ -125,7 +127,7 @@ const HowItWorksPage = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                margin: '16px auto 24px',
+                                margin: '24px auto 24px',
                                 color: '#2563eb'
                             }}>
                                 {step.icon}
